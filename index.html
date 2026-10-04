@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DoctorFinder — Find Trusted Doctors in Dinajpur</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <i class="fa-solid fa-stethoscope"></i>
+      <span>Doctor<strong>Finder</strong></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="doctors.html">Doctors</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn-outline">Log In</a>
+      <a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Book Appointment</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">🏥 Dinajpur Local Healthcare Platform</p>
+      <h1>Find Trusted Doctors in <span class="highlight">Dinajpur</span></h1>
+      <p class="hero-sub">Search by name, specialty, or hospital and book an appointment with ease.</p>
+      <div class="search-bar">
+        <div class="search-field">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="heroSearch" placeholder="Search by name, specialty, or hospital..." />
+        </div>
+        <div class="search-divider"></div>
+        <div class="search-location">
+          <i class="fa-solid fa-location-dot"></i>
+          <select>
+            <option>Dinajpur</option>
+            <option>Sadar</option>
+            <option>Birampur</option>
+            <option>Parbatipur</option>
+          </select>
+        </div>
+        <button class="search-btn" onclick="window.location.href='doctors.html'">Search</button>
+      </div>
+      <div class="trust-badges">
+        <div class="badge">
+          <i class="fa-solid fa-shield-halved"></i>
+          <div><strong>Verified Doctors</strong><span>Registered & trusted</span></div>
+        </div>
+        <div class="badge">
+          <i class="fa-regular fa-calendar-check"></i>
+          <div><strong>Easy Booking</strong><span>Book in a few clicks</span></div>
+        </div>
+        <div class="badge">
+          <i class="fa-solid fa-lock"></i>
+          <div><strong>Secure & Private</strong><span>Your data is safe</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-image-wrapper">
+        <div class="hero-placeholder">
+          <i class="fa-solid fa-user-doctor"></i>
+          <span>Doctor Photo</span>
+          <small>Real photo coming soon</small>
+        </div>
+        <div class="hero-badge-card">
+          <i class="fa-solid fa-shield-halved"></i>
+          <div><strong>Trusted Care</strong><span>Your health is our priority</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR — realistic numbers -->
+  <section class="stats-bar">
+    <div class="stat"><h3>12</h3><p>Verified Doctors</p></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><h3>4</h3><p>Specialties</p></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><h3>85</h3><p>Appointments Booked</p></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><h3>3</h3><p>Partner Hospitals</p></div>
+  </section>
+
+  <!-- TOP DOCTORS -->
+  <section class="doctors-section">
+    <div class="section-header">
+      <h2>Doctors in Dinajpur</h2>
+      <a href="doctors.html" class="view-all">View All Doctors <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="doctor-cards">
+
+      <div class="doctor-card">
+        <div class="doc-avatar" style="background:#DCE9F6;color:#284A6E;">RA</div>
+        <h3>Dr. Rahim Uddin</h3>
+        <p class="specialty">Cardiologist</p>
+        <p class="location"><i class="fa-solid fa-location-dot"></i> Dinajpur Medical Chamber</p>
+        <div class="card-rating"><i class="fa-solid fa-star"></i> 4.5</div>
+        <a href="doctors.html" class="book-btn">Book Appointment</a>
+      </div>
+
+      <div class="doctor-card">
+        <div class="doc-avatar" style="background:#e8f5e9;color:#2d7a3a;">SI</div>
+        <h3>Dr. Sadia Islam</h3>
+        <p class="specialty">Pediatrician</p>
+        <p class="location"><i class="fa-solid fa-location-dot"></i> City Health Center</p>
+        <div class="card-rating"><i class="fa-solid fa-star"></i> 4.7</div>
+        <a href="doctors.html" class="book-btn">Book Appointment</a>
+      </div>
+
+      <div class="doctor-card">
+        <div class="doc-avatar" style="background:#fff3e0;color:#e65100;">KH</div>
+        <h3>Dr. Kamal Hossain</h3>
+        <p class="specialty">Dermatologist</p>
+        <p class="location"><i class="fa-solid fa-location-dot"></i> Green Life Clinic</p>
+        <div class="card-rating"><i class="fa-solid fa-star"></i> 4.3</div>
+        <a href="doctors.html" class="book-btn">Book Appointment</a>
+      </div>
+
+      <div class="doctor-card">
+        <div class="doc-avatar" style="background:#f3e5f5;color:#6a1b9a;">MP</div>
+        <h3>Dr. Mimuna Parvin</h3>
+        <p class="specialty">Gynecologist</p>
+        <p class="location"><i class="fa-solid fa-location-dot"></i> Sadar Hospital</p>
+        <div class="card-rating"><i class="fa-solid fa-star"></i> 4.8</div>
+        <a href="doctors.html" class="book-btn">Book Appointment</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works">
+    <h2>How It Works</h2>
+    <p class="section-sub">Book your appointment in 3 simple steps</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <h3>Search a Doctor</h3>
+        <p>Find doctors by name, specialty, or hospital near you in Dinajpur.</p>
+      </div>
+      <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+      <div class="step">
+        <div class="step-icon"><i class="fa-regular fa-calendar-check"></i></div>
+        <h3>Check Availability</h3>
+        <p>See available time slots and remaining seats set by the doctor.</p>
+      </div>
+      <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+      <div class="step">
+        <div class="step-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+        <h3>Book & Visit</h3>
+        <p>Confirm your slot and visit the doctor at the scheduled time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer" id="contact">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <i class="fa-solid fa-stethoscope"></i>
+          <span>Doctor<strong>Finder</strong></span>
+        </div>
+        <p>Your trusted partner in finding the best healthcare in Dinajpur.</p>
+        <div class="social-links">
+          <a href="#"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="about.html">About</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <p><i class="fa-solid fa-phone"></i> +880 1521-234567</p>
+        <p><i class="fa-solid fa-envelope"></i> hello@doctorfinder.com</p>
+        <p><i class="fa-solid fa-location-dot"></i> Dinajpur Sadar, Bangladesh</p>
+      </div>
+      <div class="footer-col">
+        <h4>Subscribe</h4>
+        <p>Get health tips to your inbox.</p>
+        <div class="newsletter">
+          <input type="email" placeholder="Enter your email" />
+          <button><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 DoctorFinder. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

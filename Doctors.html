@@ -1,0 +1,389 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doctors — DoctorFinder</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="doctors.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <i class="fa-solid fa-stethoscope"></i>
+      <span>Doctor<strong>Finder</strong></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="doctors.html" class="active">Doctors</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn-outline">Log In</a>
+      <a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Book Appointment</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <h1>Find a Doctor</h1>
+    <p>Search from our verified doctors in Dinajpur</p>
+    <div class="search-bar doctors-search">
+      <div class="search-field">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, specialty, or hospital..." />
+      </div>
+      <div class="search-divider"></div>
+      <div class="search-location">
+        <i class="fa-solid fa-location-dot"></i>
+        <select id="locationFilter">
+          <option value="all">All Areas</option>
+          <option value="sadar">Sadar</option>
+          <option value="birampur">Birampur</option>
+          <option value="parbatipur">Parbatipur</option>
+        </select>
+      </div>
+      <button class="search-btn">Search</button>
+    </div>
+  </section>
+
+  <!-- MAIN LAYOUT -->
+  <div class="doctors-layout">
+
+    <!-- FILTERS -->
+    <aside class="filters-panel">
+      <h3>Filter By</h3>
+      <div class="filter-group">
+        <h4>Specialty</h4>
+        <label><input type="radio" name="specialty" value="all" checked /> All</label>
+        <label><input type="radio" name="specialty" value="Cardiologist" /> Cardiologist</label>
+        <label><input type="radio" name="specialty" value="Pediatrician" /> Pediatrician</label>
+        <label><input type="radio" name="specialty" value="Dermatologist" /> Dermatologist</label>
+        <label><input type="radio" name="specialty" value="Gynecologist" /> Gynecologist</label>
+      </div>
+      <div class="filter-group">
+        <h4>Availability</h4>
+        <label><input type="checkbox" id="availToday" /> Has slots today</label>
+        <label><input type="checkbox" id="availWeekend" /> Available on Weekend</label>
+      </div>
+      <button class="clear-filters-btn" onclick="clearFilters()">Clear Filters</button>
+    </aside>
+
+    <!-- DOCTOR CARDS -->
+    <main class="doctors-main">
+      <div class="results-bar">
+        <p id="resultsCount">Showing 4 doctors</p>
+        <select class="sort-select" id="sortSelect">
+          <option value="default">Sort by: Default</option>
+          <option value="name">Name A–Z</option>
+          <option value="fees">Fees: Low to High</option>
+          <option value="rating">Highest Rated</option>
+        </select>
+      </div>
+
+      <div class="doctor-grid" id="doctorGrid">
+
+        <!-- Doctor 1 -->
+        <div class="doctor-card-lg" data-specialty="Cardiologist" data-hospital="Dinajpur Medical Chamber" data-name="Dr. Rahim Uddin" data-fees="500" data-rating="4.5">
+          <div class="doc-avatar-lg" style="background:#DCE9F6;color:#284A6E;">RU</div>
+          <div class="card-info">
+            <div class="card-top">
+              <div>
+                <h3>Dr. Rahim Uddin</h3>
+                <p class="specialty"><i class="fa-solid fa-user-doctor"></i> Cardiologist</p>
+                <p class="hospital"><i class="fa-solid fa-hospital"></i> Dinajpur Medical Chamber</p>
+              </div>
+              <span class="fees-badge">৳500</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag"><i class="fa-regular fa-clock"></i> Sat–Thu</span>
+              <span class="tag rating-tag"><i class="fa-solid fa-star"></i> 4.5 <span class="rating-count">(8 reviews)</span></span>
+              <span class="tag available">Slots Available</span>
+            </div>
+            <div class="card-actions">
+              <button class="view-btn" onclick="openProfile(0)">View Profile</button>
+              <button class="book-btn-lg" onclick="openBooking(0)">Book Appointment</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctor 2 -->
+        <div class="doctor-card-lg" data-specialty="Pediatrician" data-hospital="City Health Center" data-name="Dr. Sadia Islam" data-fees="400" data-rating="4.7">
+          <div class="doc-avatar-lg" style="background:#e8f5e9;color:#2d7a3a;">SI</div>
+          <div class="card-info">
+            <div class="card-top">
+              <div>
+                <h3>Dr. Sadia Islam</h3>
+                <p class="specialty"><i class="fa-solid fa-user-doctor"></i> Pediatrician</p>
+                <p class="hospital"><i class="fa-solid fa-hospital"></i> City Health Center</p>
+              </div>
+              <span class="fees-badge">৳400</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag"><i class="fa-regular fa-clock"></i> Sun–Thu</span>
+              <span class="tag rating-tag"><i class="fa-solid fa-star"></i> 4.7 <span class="rating-count">(13 reviews)</span></span>
+              <span class="tag available">Slots Available</span>
+            </div>
+            <div class="card-actions">
+              <button class="view-btn" onclick="openProfile(1)">View Profile</button>
+              <button class="book-btn-lg" onclick="openBooking(1)">Book Appointment</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctor 3 -->
+        <div class="doctor-card-lg" data-specialty="Dermatologist" data-hospital="Green Life Clinic" data-name="Dr. Kamal Hossain" data-fees="600" data-rating="4.3">
+          <div class="doc-avatar-lg" style="background:#fff3e0;color:#e65100;">KH</div>
+          <div class="card-info">
+            <div class="card-top">
+              <div>
+                <h3>Dr. Kamal Hossain</h3>
+                <p class="specialty"><i class="fa-solid fa-user-doctor"></i> Dermatologist</p>
+                <p class="hospital"><i class="fa-solid fa-hospital"></i> Green Life Clinic</p>
+              </div>
+              <span class="fees-badge">৳600</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag"><i class="fa-regular fa-clock"></i> Sat–Wed</span>
+              <span class="tag rating-tag"><i class="fa-solid fa-star"></i> 4.3 <span class="rating-count">(6 reviews)</span></span>
+              <span class="tag unavailable">No Slots Today</span>
+            </div>
+            <div class="card-actions">
+              <button class="view-btn" onclick="openProfile(2)">View Profile</button>
+              <button class="book-btn-lg" onclick="openBooking(2)">Book Appointment</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctor 4 -->
+        <div class="doctor-card-lg" data-specialty="Gynecologist" data-hospital="Sadar Hospital" data-name="Dr. Mimuna Parvin" data-fees="500" data-rating="4.8">
+          <div class="doc-avatar-lg" style="background:#f3e5f5;color:#6a1b9a;">MP</div>
+          <div class="card-info">
+            <div class="card-top">
+              <div>
+                <h3>Dr. Mimuna Parvin</h3>
+                <p class="specialty"><i class="fa-solid fa-user-doctor"></i> Gynecologist</p>
+                <p class="hospital"><i class="fa-solid fa-hospital"></i> Sadar Hospital</p>
+              </div>
+              <span class="fees-badge">৳500</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag"><i class="fa-regular fa-clock"></i> Sat–Thu</span>
+              <span class="tag rating-tag"><i class="fa-solid fa-star"></i> 4.8 <span class="rating-count">(21 reviews)</span></span>
+              <span class="tag available">Slots Available</span>
+            </div>
+            <div class="card-actions">
+              <button class="view-btn" onclick="openProfile(3)">View Profile</button>
+              <button class="book-btn-lg" onclick="openBooking(3)">Book Appointment</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end doctor-grid -->
+
+      <div class="no-results" id="noResults" style="display:none;">
+        <i class="fa-solid fa-user-slash"></i>
+        <h3>No doctors found</h3>
+        <p>Try a different name, specialty, or hospital.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeProfile()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-profile">
+        <div class="modal-avatar" id="modalAvatar"></div>
+        <div class="modal-info">
+          <h2 id="modalName"></h2>
+          <p class="modal-specialty" id="modalSpecialty"></p>
+          <p class="modal-hospital" id="modalHospital"></p>
+          <div class="modal-details">
+            <div class="detail-item">
+              <i class="fa-solid fa-money-bill-wave"></i>
+              <div><strong>Consultation Fee</strong><span id="modalFees"></span></div>
+            </div>
+            <div class="detail-item">
+              <i class="fa-regular fa-clock"></i>
+              <div><strong>Available Days</strong><span id="modalDays"></span></div>
+            </div>
+            <div class="detail-item">
+              <i class="fa-solid fa-star"></i>
+              <div><strong>Rating</strong><span id="modalRating"></span></div>
+            </div>
+          </div>
+          <p class="modal-bio" id="modalBio"></p>
+
+          <!-- PATIENT REVIEWS -->
+          <div class="reviews-section">
+            <h4><i class="fa-solid fa-comments"></i> Patient Reviews</h4>
+            <div class="reviews-list" id="modalReviews"></div>
+          </div>
+
+          <button class="book-btn-lg modal-book" id="modalBookBtn">Book Appointment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKING MODAL -->
+  <div class="modal-overlay" id="bookingModal">
+    <div class="modal booking-modal">
+      <button class="modal-close" onclick="closeBooking()"><i class="fa-solid fa-xmark"></i></button>
+      <h2><i class="fa-regular fa-calendar-check"></i> Book Appointment</h2>
+      <p class="booking-doctor-name" id="bookingDoctorName"></p>
+
+      <!-- Booking Type Tabs -->
+      <div class="booking-type-tabs">
+        <button class="booking-type-tab active" id="tabNormal" onclick="setBookingType('normal')">
+          <i class="fa-solid fa-calendar-check"></i> Normal Booking
+        </button>
+        <button class="booking-type-tab emergency" id="tabEmergency" onclick="setBookingType('emergency')">
+          <i class="fa-solid fa-triangle-exclamation"></i> Emergency
+        </button>
+      </div>
+
+      <!-- NORMAL BOOKING FORM -->
+      <div id="normalBookingForm" class="booking-form">
+        <div class="form-group">
+          <label>Your Full Name</label>
+          <input type="text" id="patientName" placeholder="e.g. Md. Karim Hossain" />
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="patientPhone" placeholder="e.g. 01700-000000" />
+        </div>
+
+        <!-- Time Slots set by doctor -->
+        <div class="form-group">
+          <label><i class="fa-regular fa-clock"></i> Available Time Slots <span class="slot-note">(set by doctor)</span></label>
+          <div class="slots-grid" id="slotsGrid"></div>
+          <p class="no-slots-msg" id="noSlotsMsg" style="display:none;">
+            <i class="fa-solid fa-circle-info"></i> No slots available today. Please try another day.
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label>Problem / Reason <span>(optional)</span></label>
+          <textarea id="patientReason" placeholder="Briefly describe your symptoms..."></textarea>
+        </div>
+
+        <button class="confirm-btn" onclick="confirmBooking('normal')">Confirm Appointment</button>
+      </div>
+
+      <!-- EMERGENCY FORM -->
+      <div id="emergencyForm" class="booking-form" style="display:none;">
+        <div class="emergency-banner">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <div>
+            <strong>Emergency Request</strong>
+            <span>The doctor will be notified immediately and will decide whether to accept.</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Your Full Name</label>
+          <input type="text" id="emergencyName" placeholder="e.g. Md. Karim Hossain" />
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="emergencyPhone" placeholder="e.g. 01700-000000" />
+        </div>
+        <div class="form-group">
+          <label>Describe the Emergency <span style="color:red;">*</span></label>
+          <textarea id="emergencyDesc" placeholder="Describe the emergency situation clearly..." rows="4"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Current Location</label>
+          <input type="text" id="emergencyLocation" placeholder="e.g. Dinajpur Sadar, near central mosque" />
+        </div>
+        <button class="confirm-btn emergency-confirm-btn" onclick="confirmBooking('emergency')">
+          <i class="fa-solid fa-triangle-exclamation"></i> Send Emergency Request
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RATING MODAL -->
+  <div class="modal-overlay" id="ratingModal">
+    <div class="modal rating-modal">
+      <button class="modal-close" onclick="closeRating()"><i class="fa-solid fa-xmark"></i></button>
+      <h2><i class="fa-solid fa-star"></i> Rate Your Doctor</h2>
+      <p class="booking-doctor-name" id="ratingDoctorName"></p>
+      <div class="star-selector">
+        <span class="star-btn" data-val="1" onclick="selectStar(1)"><i class="fa-solid fa-star"></i></span>
+        <span class="star-btn" data-val="2" onclick="selectStar(2)"><i class="fa-solid fa-star"></i></span>
+        <span class="star-btn" data-val="3" onclick="selectStar(3)"><i class="fa-solid fa-star"></i></span>
+        <span class="star-btn" data-val="4" onclick="selectStar(4)"><i class="fa-solid fa-star"></i></span>
+        <span class="star-btn" data-val="5" onclick="selectStar(5)"><i class="fa-solid fa-star"></i></span>
+      </div>
+      <p class="star-label" id="starLabel">Tap a star to rate</p>
+      <div class="form-group" style="margin-top:14px;">
+        <label>Leave a comment <span>(optional)</span></label>
+        <textarea id="ratingComment" placeholder="Share your experience..."></textarea>
+      </div>
+      <button class="confirm-btn" onclick="submitRating()">Submit Rating</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Done!</span>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer" id="contact">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <i class="fa-solid fa-stethoscope"></i>
+          <span>Doctor<strong>Finder</strong></span>
+        </div>
+        <p>Your trusted partner in finding the best healthcare in Dinajpur.</p>
+        <div class="social-links">
+          <a href="#"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="about.html">About</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <p><i class="fa-solid fa-phone"></i> +880 1521-234567</p>
+        <p><i class="fa-solid fa-envelope"></i> hello@doctorfinder.com</p>
+        <p><i class="fa-solid fa-location-dot"></i> Dinajpur Sadar, Bangladesh</p>
+      </div>
+      <div class="footer-col">
+        <h4>Newsletter</h4>
+        <p>Get health tips to your inbox.</p>
+        <div class="newsletter">
+          <input type="email" placeholder="Enter your email" />
+          <button><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 DoctorFinder. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script src="doctors.js"></script>
+</body>
+</html>

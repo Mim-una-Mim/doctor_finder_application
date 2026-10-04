@@ -1,0 +1,293 @@
+                                                                                                         <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — DoctorFinder</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="login.css" />
+  <link rel="stylesheet" href="register.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="auth-body">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <i class="fa-solid fa-stethoscope"></i>
+      <span>Doctor<strong>Finder</strong></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="doctors.html">Doctors</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn-outline">Log In</a>
+      <a href="register.html" class="btn-primary"><i class="fa-solid fa-user-plus"></i> Register</a>
+    </div>
+  </nav>
+
+  <!-- LAYOUT -->
+  <div class="auth-layout">
+
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+      <div class="auth-left-content">
+        <div class="auth-logo">
+          <i class="fa-solid fa-stethoscope"></i>
+          <span>Doctor<strong>Finder</strong></span>
+        </div>
+        <h2>Join DoctorFinder today!</h2>
+        <p>Create your account and be part of Dinajpur's most trusted healthcare platform — whether you're a patient seeking care or a doctor offering it.</p>
+        <div class="auth-features">
+          <div class="auth-feature">
+            <i class="fa-solid fa-user-doctor"></i>
+            <span>Doctors — list your chamber and manage bookings</span>
+          </div>
+          <div class="auth-feature">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <span>Patients — find and book doctors instantly</span>
+          </div>
+          <div class="auth-feature">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>100% secure and private registration</span>
+          </div>
+          <div class="auth-feature">
+            <i class="fa-solid fa-bell"></i>
+            <span>Get reminders and health updates</span>
+          </div>
+        </div>
+        <div class="auth-stats">
+          <div class="auth-stat"><strong>150+</strong><span>Doctors</span></div>
+          <div class="auth-stat"><strong>5,000+</strong><span>Patients</span></div>
+          <div class="auth-stat"><strong>Free</strong><span>To Join</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-right register-right">
+      <div class="auth-card register-card">
+
+        <h2>Create Your Account</h2>
+        <p class="auth-subtitle">Already have an account? <a href="login.html">Log in here</a></p>
+
+        <!-- Role Tabs -->
+        <div class="role-tabs">
+          <button class="role-tab active" id="tabPatient" onclick="setRole('patient')">
+            <i class="fa-solid fa-user"></i> Patient
+          </button>
+          <button class="role-tab" id="tabDoctor" onclick="setRole('doctor')">
+            <i class="fa-solid fa-user-doctor"></i> Doctor
+          </button>
+        </div>
+        <p class="role-hint" id="roleHint">Registering as a <strong>Patient</strong></p>
+
+        <!-- PATIENT FORM -->
+        <form id="patientForm" class="auth-form" onsubmit="handleRegister(event, 'patient')">
+          <div class="form-section-title">Personal Information</div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label><i class="fa-solid fa-user"></i> First Name</label>
+              <input type="text" id="patientFirstName" name="firstName" placeholder="e.g. Md. Karim" required />
+            </div>
+            <div class="form-group">
+              <label><i class="fa-solid fa-user"></i> Last Name</label>
+              <input type="text" id="patientLastName" name="lastName" placeholder="e.g. Hossain" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+            <input type="email" id="patientEmail" name="email" placeholder="e.g. yourname@email.com" required />
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-phone"></i> Phone Number</label>
+            <input type="tel" id="patientPhone" name="phone" placeholder="e.g. 01700-000000" required />
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label><i class="fa-solid fa-venus-mars"></i> Gender</label>
+              <select id="patientGender" name="gender" required>
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label><i class="fa-solid fa-cake-candles"></i> Date of Birth</label>
+              <input type="date" id="patientDob" name="dob" required />
+            </div>
+          </div>
+          <div class="form-section-title">Account Security</div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="patientPassword" placeholder="Min. 6 characters" required />
+              <button type="button" class="toggle-password" onclick="togglePassword('patientPassword', this)">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <div class="password-strength" id="patientStrength" style="display:none;">
+              <div class="strength-bar"><div class="strength-fill" id="patientStrengthFill"></div></div>
+              <span id="patientStrengthLabel"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> Confirm Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="patientConfirm" placeholder="Re-enter your password" required />
+              <button type="button" class="toggle-password" onclick="togglePassword('patientConfirm', this)">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" required />
+              I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+            </label>
+          </div>
+          <div class="form-error" id="patientError" style="display:none;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="patientErrorMsg"></span>
+          </div>
+          <button type="submit" class="auth-submit-btn" id="patientBtn">
+            <span>Create Patient Account</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+
+        <!-- DOCTOR FORM -->
+        <form id="doctorForm" class="auth-form" style="display:none;" onsubmit="handleRegister(event, 'doctor')">
+          <div class="form-section-title">Personal Information</div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label><i class="fa-solid fa-user"></i> First Name</label>
+              <input type="text" id="doctorFirstName" name="firstName" placeholder="e.g. Rahim" required />
+            </div>
+            <div class="form-group">
+              <label><i class="fa-solid fa-user"></i> Last Name</label>
+              <input type="text" id="doctorLastName" name="lastName" placeholder="e.g. Ahmed" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+            <input type="email" id="doctorEmail" name="email" placeholder="e.g. doctor@email.com" required />
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-phone"></i> Phone Number</label>
+            <input type="tel" id="doctorPhone" name="phone" placeholder="e.g. 01700-000000" required />
+          </div>
+          <div class="form-section-title">Professional Information</div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-user-doctor"></i> Specialty</label>
+            <select id="doctorSpecialty" name="specialty" required>
+              <option value="">Select specialty</option>
+              <option value="Cardiologist">Cardiologist</option>
+              <option value="Pediatrician">Pediatrician</option>
+              <option value="Dermatologist">Dermatologist</option>
+              <option value="Gynecologist">Gynecologist</option>
+              <option value="Neurologist">Neurologist</option>
+              <option value="Orthopedic">Orthopedic</option>
+              <option value="General Physician">General Physician</option>
+              <option value="ENT Specialist">ENT Specialist</option>
+              <option value="Ophthalmologist">Ophthalmologist</option>
+              <option value="Psychiatrist">Psychiatrist</option>
+            </select>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label><i class="fa-solid fa-graduation-cap"></i> BMDC Reg. No.</label>
+              <input type="text" id="doctorBmdc" name="bmdc" placeholder="e.g. A-12345" required />
+            </div>
+            <div class="form-group">
+              <label><i class="fa-solid fa-money-bill-wave"></i> Consultation Fee (৳)</label>
+              <input type="number" id="doctorFee" name="fee" placeholder="e.g. 500" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-hospital"></i> Chamber / Hospital Name</label>
+            <input type="text" id="doctorChamber" name="chamber" placeholder="e.g. Dinajpur Medical Chamber" required />
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-location-dot"></i> Chamber Address</label>
+            <input type="text" id="doctorAddress" name="address" placeholder="e.g. Station Road, Dinajpur Sadar" required />
+          </div>
+          <div class="form-group">
+            <label><i class="fa-regular fa-clock"></i> Available Days</label>
+            <div class="days-selector">
+              <label class="day-chip"><input type="checkbox" name="doctorDays" value="Sat" /> Sat</label>
+              <label class="day-chip"><input type="checkbox" name="doctorDays" value="Sun" /> Sun</label>
+              <label class="day-chip"><input type="checkbox" name="doctorDays" value="Mon" /> Mon</label>
+              <label class="day-chip"><input type="checkbox" name="doctorDays" value="Tue" /> Tue</label>
+              <label class="day-chip"><input type="checkbox" name="doctorDays" value="Wed" /> Wed</label>
+              <label class="day-chip"><input type="checkbox" name="doctorDays" value="Thu" /> Thu</label>
+              <label class="day-chip"><input type="checkbox" name="doctorDays" value="Fri" /> Fri</label>
+            </div>
+          </div>
+          <div class="form-section-title">Account Security</div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="doctorPassword" placeholder="Min. 6 characters" required />
+              <button type="button" class="toggle-password" onclick="togglePassword('doctorPassword', this)">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <div class="password-strength" id="doctorStrength" style="display:none;">
+              <div class="strength-bar"><div class="strength-fill" id="doctorStrengthFill"></div></div>
+              <span id="doctorStrengthLabel"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> Confirm Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="doctorConfirm" placeholder="Re-enter your password" required />
+              <button type="button" class="toggle-password" onclick="togglePassword('doctorConfirm', this)">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" required />
+              I confirm my credentials are valid and agree to <a href="#">Terms of Service</a>
+            </label>
+          </div>
+          <div class="form-error" id="doctorError" style="display:none;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="doctorErrorMsg"></span>
+          </div>
+          <button type="submit" class="auth-submit-btn" id="doctorBtn">
+            <span>Create Doctor Account</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+
+        <div class="auth-divider"><span>or register with</span></div>
+        <div class="social-auth">
+          <button class="social-btn" onclick="socialRegister('Google')">
+            <i class="fa-brands fa-google"></i> Google
+          </button>
+          <button class="social-btn" onclick="socialRegister('Facebook')">
+            <i class="fa-brands fa-facebook"></i> Facebook
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Account created successfully!</span>
+  </div>
+
+  <script src="register.js"></script>
+</body>
+</html>
