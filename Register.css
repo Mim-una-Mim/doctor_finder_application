@@ -1,0 +1,163 @@
+                                                                                                                             /* ===== REGISTER RIGHT PANEL (scrollable) ===== */
+.register-right {
+  align-items: flex-start;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.register-card {
+  max-width: 480px;
+  width: 100%;
+}
+
+/* ===== FORM SECTION TITLE ===== */
+.form-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--steel);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 6px 0 2px;
+  border-bottom: 1px solid var(--light-gray);
+  margin-bottom: 4px;
+}
+
+/* ===== TWO-COLUMN FORM ROW ===== */
+.form-row-2 {
+  display: flex;
+  gap: 14px;
+}
+
+.form-row-2 .form-group {
+  flex: 1;
+}
+
+/* ===== SELECT STYLING ===== */
+.auth-form select {
+  padding: 11px 14px;
+  border: 1.5px solid var(--light-gray);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--charcoal);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  background-color: var(--white);
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235F6E82' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.auth-form select:focus {
+  border-color: var(--steel);
+  box-shadow: 0 0 0 3px rgba(63, 111, 152, 0.1);
+}
+
+/* ===== PASSWORD STRENGTH ===== */
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 5px;
+  background-color: var(--light-gray);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 10px;
+  width: 0%;
+  transition: width 0.3s, background-color 0.3s;
+}
+
+.password-strength span {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== DAYS SELECTOR ===== */
+.days-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.day-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border: 1.5px solid var(--light-gray);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.day-chip input[type="checkbox"] {
+  display: none;
+}
+
+.day-chip:has(input:checked) {
+  background-color: var(--navy);
+  border-color: var(--navy);
+  color: white;
+}
+
+.day-chip:hover {
+  border-color: var(--steel);
+  color: var(--steel);
+}
+
+.day-chip:has(input:checked):hover {
+  background-color: var(--charcoal);
+  border-color: var(--charcoal);
+  color: white;
+}
+
+/* ===== CHECKBOX GROUP ===== */
+.checkbox-group {
+  margin-top: 4px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--gray);
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: var(--steel);
+  width: 15px;
+  height: 15px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.checkbox-label a {
+  color: var(--steel);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.checkbox-label a:hover {
+  text-decoration: underline;
+}
