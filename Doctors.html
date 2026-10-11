@@ -60,13 +60,20 @@
     <!-- FILTERS -->
     <aside class="filters-panel">
       <h3>Filter By</h3>
-      <div class="filter-group">
+      <div class="filter-group" id="specialtyFilterGroup">
         <h4>Specialty</h4>
         <label><input type="radio" name="specialty" value="all" checked /> All</label>
         <label><input type="radio" name="specialty" value="Cardiologist" /> Cardiologist</label>
-        <label><input type="radio" name="specialty" value="Pediatrician" /> Pediatrician</label>
         <label><input type="radio" name="specialty" value="Dermatologist" /> Dermatologist</label>
+        <label><input type="radio" name="specialty" value="ENT Specialist" /> ENT Specialist</label>
+        <label><input type="radio" name="specialty" value="General Physician" /> General Physician</label>
         <label><input type="radio" name="specialty" value="Gynecologist" /> Gynecologist</label>
+        <label><input type="radio" name="specialty" value="Medicine" /> Medicine</label>
+        <label><input type="radio" name="specialty" value="Neurologist" /> Neurologist</label>
+        <label><input type="radio" name="specialty" value="Ophthalmology" /> Ophthalmology</label>
+        <label><input type="radio" name="specialty" value="Orthopedics" /> Orthopedics</label>
+        <label><input type="radio" name="specialty" value="Pediatrician" /> Pediatrician</label>
+        <label><input type="radio" name="specialty" value="Psychiatry" /> Psychiatry</label>
       </div>
       <div class="filter-group">
         <h4>Availability</h4>
@@ -262,6 +269,11 @@
           <input type="tel" id="patientPhone" placeholder="e.g. 01700-000000" />
         </div>
 
+        <div class="form-group">
+          <label><i class="fa-regular fa-calendar-days"></i> Appointment Date</label>
+          <input type="date" id="appointmentDate" />
+        </div>
+
         <!-- Time Slots set by doctor -->
         <div class="form-group">
           <label><i class="fa-regular fa-clock"></i> Available Time Slots <span class="slot-note">(set by doctor)</span></label>
@@ -331,6 +343,18 @@
         <textarea id="ratingComment" placeholder="Share your experience..."></textarea>
       </div>
       <button class="confirm-btn" onclick="submitRating()">Submit Rating</button>
+    </div>
+  </div>
+
+  <!-- APPOINTMENTS MANAGEMENT MODAL -->
+  <div class="modal-overlay" id="appointmentsModal">
+    <div class="modal" style="max-width: 680px;">
+      <button class="modal-close" onclick="closeAppointments()"><i class="fa-solid fa-xmark"></i></button>
+      <h2 style="font-size: 20px; font-weight: 700; color: var(--charcoal); margin-bottom: 4px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-regular fa-calendar-check" style="color: var(--steel);"></i> My Appointments
+      </h2>
+      <p style="font-size: 13px; color: var(--gray); margin-bottom: 20px;" id="appointmentsSubtitle">View and manage your scheduled appointments.</p>
+      <div id="appointmentsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
     </div>
   </div>
 

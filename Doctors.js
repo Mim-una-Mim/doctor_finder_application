@@ -1,158 +1,280 @@
+// ===== API CONFIGURATION =====
+// Automatically uses port 5000 if opened through VS Code Live Server or another dev server
+const API_BASE_URL = (window.location.port !== '5000') ? 'http://localhost:5000' : '';
 
-// ===== DOCTOR DATA =====
-const doctors = [
-  {
-    name: "Dr. Rahim Uddin",
-    specialty: "Cardiologist",
-    hospital: "Dinajpur Medical Chamber",
-    fees: "৳500",
-    days: "Saturday – Thursday",
-    rating: 4.5,
-    reviewCount: 8,
-    avatarText: "RU",
-    avatarStyle: "background:#DCE9F6;color:#284A6E;",
-    bio: "Dr. Rahim Uddin is a cardiologist with over 10 years of experience treating heart-related conditions. He completed his MBBS from Rajshahi Medical College.",
-    slots: [
-      { time: "9:00 AM",  seats: 3, full: false },
-      { time: "10:00 AM", seats: 1, full: false },
-      { time: "11:00 AM", seats: 0, full: true  },
-      { time: "4:00 PM",  seats: 2, full: false },
-    ],
-    reviews: [
-      { name: "Md. Faruk", stars: 5, comment: "Very experienced and caring doctor." },
-      { name: "Sultana B.", stars: 4, comment: "Good service, a bit of waiting time." },
-    ]
-  },
-  {
-    name: "Dr. Sadia Islam",
-    specialty: "Pediatrician",
-    hospital: "City Health Center",
-    fees: "৳400",
-    days: "Sunday – Thursday",
-    rating: 4.7,
-    reviewCount: 13,
-    avatarText: "SI",
-    avatarStyle: "background:#e8f5e9;color:#2d7a3a;",
-    bio: "Dr. Sadia Islam is a pediatrician dedicated to child health. She is known for her gentle approach with young patients and thorough examinations.",
-    slots: [
-      { time: "8:30 AM",  seats: 2, full: false },
-      { time: "10:00 AM", seats: 0, full: true  },
-      { time: "3:00 PM",  seats: 4, full: false },
-    ],
-    reviews: [
-      { name: "Rahima K.", stars: 5, comment: "Best pediatrician in Dinajpur. My child recovered quickly." },
-      { name: "Md. Jalal", stars: 4, comment: "Very kind and professional." },
-    ]
-  },
-  {
-    name: "Dr. Kamal Hossain",
-    specialty: "Dermatologist",
-    hospital: "Green Life Clinic",
-    fees: "৳600",
-    days: "Saturday – Wednesday",
-    rating: 4.3,
-    reviewCount: 6,
-    avatarText: "KH",
-    avatarStyle: "background:#fff3e0;color:#e65100;",
-    bio: "Dr. Kamal Hossain specializes in skin, hair, and nail disorders. He has been serving patients in Dinajpur for 7 years.",
-    slots: [],
-    reviews: [
-      { name: "Nasrin A.", stars: 4, comment: "Good doctor, explains everything clearly." },
-    ]
-  },
-  {
-    name: "Dr. Mimuna Parvin",
-    specialty: "Gynecologist",
-    hospital: "Sadar Hospital",
-    fees: "৳500",
-    days: "Saturday – Thursday",
-    rating: 4.8,
-    reviewCount: 21,
-    avatarText: "MP",
-    avatarStyle: "background:#f3e5f5;color:#6a1b9a;",
-    bio: "Dr. Mimuna Parvin is a trusted gynecologist and obstetrician with 12 years of experience. She is highly regarded for her patient-centered care.",
-    slots: [
-      { time: "9:00 AM",  seats: 1, full: false },
-      { time: "11:30 AM", seats: 3, full: false },
-      { time: "5:00 PM",  seats: 0, full: true  },
-    ],
-    reviews: [
-      { name: "Fatema B.", stars: 5, comment: "Excellent doctor. Very professional and reassuring." },
-      { name: "Roksana M.", stars: 5, comment: "I highly recommend Dr. Mimuna to every woman." },
-    ]
+// Global memory array of doctors (loaded from MySQL backend)
+let doctors = [];
+
+// Helper: Generate avatar initials
+function getInitials(name) {
+  if (!name) return 'DR';
+  const clean = name.replace(/^Dr\.\s*/i, '').trim();
+  const parts = clean.split(' ').filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
+  return clean.slice(0, 2).toUpperCase();
+}
+
+// Avatar palette matching existing theme
+const avatarStyles = [
+  'background:#DCE9F6;color:#284A6E;',
+  'background:#e8f5e9;color:#2d7a3a;',
+  'background:#fff3e0;color:#e65100;',
+  'background:#f3e5f5;color:#6a1b9a;'
 ];
 
-// ===== SEARCH & FILTER =====
-const searchInput   = document.getElementById('searchInput');
-const cards         = document.querySelectorAll('.doctor-card-lg');
-const noResults     = document.getElementById('noResults');
-const resultsCount  = document.getElementById('resultsCount');
+// ===== RENDER DOCTOR CARDS =====
+function renderDoctorCards(list) {
+  const grid = document.getElementById('doctorGrid');
+  const resultsCount = document.getElementById('resultsCount');
+  const noResults = document.getElementById('noResults');
 
-function filterDoctors() {
-  const text     = searchInput.value.toLowerCase();
-  const specialty = document.querySelector('input[name="specialty"]:checked').value;
-  let count = 0;
+  if (!grid) return;
 
-  cards.forEach(card => {
-    const nameMatch     = card.dataset.name.toLowerCase().includes(text);
-    const specMatch     = card.dataset.specialty.toLowerCase().includes(text);
-    const hospMatch     = card.dataset.hospital.toLowerCase().includes(text);
-    const filterMatch   = specialty === 'all' || card.dataset.specialty === specialty;
+  grid.innerHTML = '';
+  resultsCount.textContent = `Showing ${list.length} doctor${list.length !== 1 ? 's' : ''}`;
+  noResults.style.display = list.length === 0 ? 'block' : 'none';
 
-    if ((nameMatch || specMatch || hospMatch) && filterMatch) {
-      card.style.display = 'flex';
-      count++;
-    } else {
-      card.style.display = 'none';
+  list.forEach((d, idx) => {
+    const card = document.createElement('div');
+    card.className = 'doctor-card-lg';
+    card.dataset.id = d.id;
+    card.dataset.name = d.name;
+    card.dataset.specialty = d.specialty;
+    card.dataset.hospital = d.hospital || d.chamber_address || 'Dinajpur';
+    card.dataset.location = d.location || 'Sadar';
+    card.dataset.fees = d.fees || 500;
+    card.dataset.rating = d.rating || 4.5;
+    card.dataset.availableToday = d.available_today ? 'true' : 'false';
+    card.dataset.availableWeekend = d.available_weekend ? 'true' : 'false';
+
+    const avatarStyle = d.avatarStyle || avatarStyles[idx % avatarStyles.length];
+    const avatarText = d.avatarText || getInitials(d.name);
+    const availTag = d.available_today
+      ? '<span class="tag available">Available Today</span>'
+      : '<span class="tag unavailable">Unavailable Today</span>';
+
+    card.innerHTML = `
+      <div class="doc-avatar-lg" style="${avatarStyle}">${avatarText}</div>
+      <div class="card-info">
+        <div class="card-top">
+          <div>
+            <h3>${d.name}</h3>
+            <p class="specialty"><i class="fa-solid fa-user-doctor"></i> ${d.specialty}</p>
+            <p class="hospital"><i class="fa-solid fa-hospital"></i> ${d.hospital || 'Dinajpur Chamber'}</p>
+          </div>
+          <span class="fees-badge">৳${d.fees || 500}</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag"><i class="fa-regular fa-clock"></i> ${d.available_days || 'Sat–Thu'}</span>
+          <span class="tag rating-tag"><i class="fa-solid fa-star"></i> ${d.rating || 4.5} <span class="rating-count">(${d.reviewCount || 8} reviews)</span></span>
+          ${availTag}
+        </div>
+        <div class="card-actions">
+          <button class="view-btn" onclick="openProfile(${idx})">View Profile</button>
+          <button class="book-btn-lg" onclick="openBooking(${idx})">Book Appointment</button>
+        </div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+// Populate specialty filters dynamically from backend doctors list
+function populateSpecialtyFilters(doctorList) {
+  const container = document.getElementById('specialtyFilterGroup');
+  if (!container || !Array.isArray(doctorList) || doctorList.length === 0) return;
+
+  const currentChecked = document.querySelector('input[name="specialty"]:checked')?.value || 'all';
+
+  // Collect distinct non-empty specialties
+  const uniqueMap = new Map();
+  doctorList.forEach(d => {
+    if (d && d.specialty) {
+      const clean = d.specialty.trim();
+      if (clean) {
+        const key = clean.toLowerCase();
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, clean);
+        }
+      }
     }
   });
 
-  resultsCount.textContent = `Showing ${count} doctor${count !== 1 ? 's' : ''}`;
-  noResults.style.display  = count === 0 ? 'block' : 'none';
+  const sortedSpecialties = Array.from(uniqueMap.values()).sort((a, b) => a.localeCompare(b));
+  if (sortedSpecialties.length === 0) return;
+
+  let html = `<h4>Specialty</h4>\n<label><input type="radio" name="specialty" value="all" ${currentChecked === 'all' ? 'checked' : ''} /> All</label>`;
+  sortedSpecialties.forEach(sp => {
+    const isChecked = (currentChecked.toLowerCase() === sp.toLowerCase()) ? 'checked' : '';
+    html += `\n<label><input type="radio" name="specialty" value="${sp}" ${isChecked} /> ${sp}</label>`;
+  });
+
+  container.innerHTML = html;
+
+  // Re-attach change listeners
+  container.querySelectorAll('input[name="specialty"]').forEach(r => {
+    r.addEventListener('change', () => {
+      loadDoctors();
+    });
+  });
 }
 
-searchInput.addEventListener('input', filterDoctors);
-document.querySelectorAll('input[name="specialty"]').forEach(r => r.addEventListener('change', filterDoctors));
+let hasPopulatedSpecialties = false;
 
-// ===== SORT =====
-document.getElementById('sortSelect').addEventListener('change', function () {
-  const grid      = document.getElementById('doctorGrid');
-  const cardArray = Array.from(grid.querySelectorAll('.doctor-card-lg'));
+// ===== FETCH DOCTORS FROM MYSQL BACKEND =====
+async function loadDoctors() {
+  const search = document.getElementById('searchInput') ? document.getElementById('searchInput').value.trim() : '';
+  const specialtyRadio = document.querySelector('input[name="specialty"]:checked');
+  const specialty = specialtyRadio ? specialtyRadio.value : 'all';
+  const locationSelect = document.getElementById('locationFilter');
+  const location = locationSelect ? locationSelect.value : 'all';
 
-  if (this.value === 'name') {
-    cardArray.sort((a, b) => a.dataset.name.localeCompare(b.dataset.name));
-  } else if (this.value === 'fees') {
-    cardArray.sort((a, b) => parseInt(a.dataset.fees) - parseInt(b.dataset.fees));
-  } else if (this.value === 'rating') {
-    cardArray.sort((a, b) => parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating));
+  const params = new URLSearchParams();
+  if (search) params.append('search', search);
+  if (specialty && specialty !== 'all') params.append('specialty', specialty);
+  if (location && location !== 'all') params.append('location', location);
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/doctors?${params.toString()}`);
+    const data = await res.json();
+    if (data.success && Array.isArray(data.doctors)) {
+      doctors = data.doctors.map((d, i) => ({
+        ...d,
+        avatarText: getInitials(d.name),
+        avatarStyle: avatarStyles[i % avatarStyles.length],
+        rating: d.rating || (4.3 + (i % 6) * 0.1).toFixed(1),
+        reviewCount: d.reviewCount || (8 + i * 3),
+        reviews: [
+          { name: 'Md. Faruk', stars: 5, comment: 'Very experienced and caring doctor.' },
+          { name: 'Sultana B.', stars: 4, comment: 'Good service and detailed consultation.' }
+        ]
+      }));
+
+      // On first unfiltered load (or if not yet populated), populate the specialty list dynamically
+      if (!hasPopulatedSpecialties && (!search && specialty === 'all' && location === 'all')) {
+        populateSpecialtyFilters(doctors);
+        hasPopulatedSpecialties = true;
+      }
+
+      filterDoctorCardsInMemory();
+    }
+  } catch (err) {
+    console.error('Failed to load doctors from backend:', err);
   }
-  cardArray.forEach(c => grid.appendChild(c));
+}
+
+// Memory filter for instant UI response and checkbox filters
+function filterDoctorCardsInMemory() {
+  const availTodayChecked = document.getElementById('availToday') ? document.getElementById('availToday').checked : false;
+  const availWeekendChecked = document.getElementById('availWeekend') ? document.getElementById('availWeekend').checked : false;
+
+  let filtered = doctors.slice();
+
+  if (availTodayChecked) {
+    filtered = filtered.filter(d => d.available_today);
+  }
+  if (availWeekendChecked) {
+    filtered = filtered.filter(d => d.available_weekend);
+  }
+
+  // Sort
+  const sortSelect = document.getElementById('sortSelect');
+  if (sortSelect) {
+    if (sortSelect.value === 'name') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortSelect.value === 'fees') {
+      filtered.sort((a, b) => parseFloat(a.fees) - parseFloat(b.fees));
+    } else if (sortSelect.value === 'rating') {
+      filtered.sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating));
+    }
+  }
+
+  renderDoctorCards(filtered);
+}
+
+// ===== EVENT LISTENERS =====
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+  searchInput.addEventListener('input', () => {
+    loadDoctors();
+  });
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      loadDoctors();
+    }
+  });
+}
+
+const searchBtn = document.querySelector('.search-btn');
+if (searchBtn) {
+  searchBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    loadDoctors();
+  });
+}
+
+document.querySelectorAll('input[name="specialty"]').forEach(r => {
+  r.addEventListener('change', () => {
+    loadDoctors();
+  });
 });
 
+const locationFilter = document.getElementById('locationFilter');
+if (locationFilter) {
+  locationFilter.addEventListener('change', () => {
+    loadDoctors();
+  });
+}
+
+const availToday = document.getElementById('availToday');
+if (availToday) {
+  availToday.addEventListener('change', filterDoctorCardsInMemory);
+}
+
+const availWeekend = document.getElementById('availWeekend');
+if (availWeekend) {
+  availWeekend.addEventListener('change', filterDoctorCardsInMemory);
+}
+
+const sortSelect = document.getElementById('sortSelect');
+if (sortSelect) {
+  sortSelect.addEventListener('change', filterDoctorCardsInMemory);
+}
+
 function clearFilters() {
-  searchInput.value = '';
-  document.querySelector('input[name="specialty"][value="all"]').checked = true;
-  document.getElementById('availToday').checked   = false;
-  document.getElementById('availWeekend').checked = false;
-  filterDoctors();
+  if (searchInput) searchInput.value = '';
+  const allRadio = document.querySelector('input[name="specialty"][value="all"]');
+  if (allRadio) allRadio.checked = true;
+  if (locationFilter) locationFilter.value = 'all';
+  if (availToday) availToday.checked = false;
+  if (availWeekend) availWeekend.checked = false;
+  if (sortSelect) sortSelect.value = 'default';
+  loadDoctors();
 }
 
 // ===== PROFILE MODAL =====
 function openProfile(i) {
   const d = doctors[i];
-  document.getElementById('modalAvatar').textContent     = d.avatarText;
-  document.getElementById('modalAvatar').style.cssText   = d.avatarStyle + 'width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;flex-shrink:0;border:3px solid #E5EDF5;';
-  document.getElementById('modalName').textContent       = d.name;
-  document.getElementById('modalSpecialty').textContent  = '🩺 ' + d.specialty;
-  document.getElementById('modalHospital').textContent   = '🏥 ' + d.hospital;
-  document.getElementById('modalFees').textContent       = d.fees;
-  document.getElementById('modalDays').textContent       = d.days;
-  document.getElementById('modalRating').textContent     = d.rating + ' / 5 (' + d.reviewCount + ' reviews)';
-  document.getElementById('modalBio').textContent        = d.bio;
+  if (!d) return;
+
+  const modalAvatar = document.getElementById('modalAvatar');
+  modalAvatar.textContent = d.avatarText;
+  modalAvatar.style.cssText = d.avatarStyle + 'width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;flex-shrink:0;border:3px solid #E5EDF5;';
+
+  document.getElementById('modalName').textContent = d.name;
+  document.getElementById('modalSpecialty').textContent = '🩺 ' + d.specialty + (d.degree ? ` (${d.degree})` : '');
+  document.getElementById('modalHospital').textContent = '🏥 ' + (d.hospital || 'Dinajpur Chamber');
+  document.getElementById('modalFees').textContent = '৳' + (d.fees || 500);
+  document.getElementById('modalDays').textContent = d.available_days || 'Sat–Thu';
+  document.getElementById('modalRating').textContent = (d.rating || 4.5) + ' / 5 (' + (d.reviewCount || 8) + ' reviews)';
+  document.getElementById('modalBio').textContent = d.bio || 'Verified specialist doctor.';
 
   // Reviews
-  const reviewsHtml = d.reviews.map(r => `
+  const reviewsHtml = (d.reviews || []).map(r => `
     <div class="review-item">
       <div class="review-header">
         <span class="review-name">${r.name}</span>
@@ -175,46 +297,103 @@ function closeProfile() {
   document.getElementById('profileModal').classList.remove('open');
 }
 
-document.getElementById('profileModal').addEventListener('click', function (e) {
-  if (e.target === this) closeProfile();
-});
+const profileModalEl = document.getElementById('profileModal');
+if (profileModalEl) {
+  profileModalEl.addEventListener('click', function (e) {
+    if (e.target === this) closeProfile();
+  });
+}
 
 // ===== BOOKING MODAL =====
 let currentDoctorIndex = 0;
-let selectedSlot       = null;
+let selectedSlot = null; // will store slot label, e.g. "4:00 PM"
+let currentDoctorSlots = [];
+
+async function fetchDoctorSlots(doctorId, dateStr) {
+  const grid = document.getElementById('slotsGrid');
+  const noMsg = document.getElementById('noSlotsMsg');
+  grid.innerHTML = '<span style="font-size:13px;color:var(--gray);">Loading available slots...</span>';
+  noMsg.style.display = 'none';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/doctors/${doctorId}/slots?date=${dateStr}`);
+    const data = await res.json();
+
+    if (!data.success || !data.available || !data.slots || data.slots.length === 0) {
+      grid.innerHTML = '';
+      noMsg.style.display = 'flex';
+      noMsg.innerHTML = `<i class="fa-solid fa-circle-info"></i> ${data.message || 'No slots available for this date. Please select another day.'}`;
+      currentDoctorSlots = [];
+      return;
+    }
+
+    currentDoctorSlots = data.slots;
+    noMsg.style.display = 'none';
+
+    grid.innerHTML = data.slots.map((s, idx) => `
+      <button type="button" class="slot-btn ${s.full ? 'slot-full' : ''}" onclick="${s.full ? '' : `selectSlot(${idx}, this)`}" ${s.full ? 'disabled' : ''}>
+        <span class="slot-time">${s.time}</span>
+        <span class="slot-seats">${s.full ? 'Booked' : (s.seats + ' left')}</span>
+      </button>
+    `).join('');
+  } catch (err) {
+    grid.innerHTML = '';
+    noMsg.style.display = 'flex';
+    noMsg.innerHTML = `<i class="fa-solid fa-circle-info"></i> Unable to load slots. Please check your connection.`;
+  }
+}
 
 function openBooking(i) {
   currentDoctorIndex = i;
-  selectedSlot       = null;
+  selectedSlot = null;
   const d = doctors[i];
+  if (!d) return;
 
   document.getElementById('bookingDoctorName').textContent = d.name + ' — ' + d.specialty;
 
-  // Reset to normal tab
-  setBookingType('normal');
+  // Pre-fill patient details if logged in
+  const userJson = localStorage.getItem('user');
+  if (userJson) {
+    try {
+      const u = JSON.parse(userJson);
+      const nameInput = document.getElementById('patientName');
+      const phoneInput = document.getElementById('patientPhone');
+      if (nameInput && !nameInput.value) nameInput.value = `${u.first_name} ${u.last_name}`;
+      if (phoneInput && !phoneInput.value) phoneInput.value = u.phone || '';
 
-  // Build slots
-  const grid = document.getElementById('slotsGrid');
-  const noMsg = document.getElementById('noSlotsMsg');
-
-  if (d.slots.length === 0) {
-    grid.innerHTML = '';
-    noMsg.style.display = 'flex';
-  } else {
-    noMsg.style.display = 'none';
-    grid.innerHTML = d.slots.map((s, idx) => `
-      <button class="slot-btn ${s.full ? 'slot-full' : ''}" onclick="${s.full ? '' : 'selectSlot(' + idx + ', this)'}" ${s.full ? 'disabled' : ''}>
-        <span class="slot-time">${s.time}</span>
-        <span class="slot-seats">${s.full ? 'Full' : s.seats + ' seat' + (s.seats !== 1 ? 's' : '') + ' left'}</span>
-      </button>
-    `).join('');
+      const emNameInput = document.getElementById('emergencyName');
+      const emPhoneInput = document.getElementById('emergencyPhone');
+      if (emNameInput && !emNameInput.value) emNameInput.value = `${u.first_name} ${u.last_name}`;
+      if (emPhoneInput && !emPhoneInput.value) emPhoneInput.value = u.phone || '';
+    } catch (e) {}
   }
 
+  // Set appointment date input
+  const dateInput = document.getElementById('appointmentDate');
+  if (dateInput) {
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+    if (!dateInput.value || dateInput.value < today) {
+      dateInput.value = today;
+    }
+
+    // Refresh slots on date change
+    dateInput.onchange = () => {
+      fetchDoctorSlots(d.id, dateInput.value);
+    };
+
+    fetchDoctorSlots(d.id, dateInput.value);
+  }
+
+  setBookingType('normal');
   document.getElementById('bookingModal').classList.add('open');
 }
 
 function selectSlot(idx, btn) {
-  selectedSlot = idx;
+  const slotObj = currentDoctorSlots[idx];
+  if (!slotObj || slotObj.full) return;
+
+  selectedSlot = slotObj.time;
   document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
 }
@@ -230,32 +409,126 @@ function closeBooking() {
   document.getElementById('bookingModal').classList.remove('open');
 }
 
-document.getElementById('bookingModal').addEventListener('click', function (e) {
-  if (e.target === this) closeBooking();
-});
+const bookingModalEl = document.getElementById('bookingModal');
+if (bookingModalEl) {
+  bookingModalEl.addEventListener('click', function (e) {
+    if (e.target === this) closeBooking();
+  });
+}
 
-// ===== CONFIRM BOOKING =====
-function confirmBooking(type) {
-  if (type === 'normal' && !selectedSlot && selectedSlot !== 0) {
-    showToast('Please select a time slot first.', 'error');
+// ===== CONFIRM BOOKING (SUBMIT TO MYSQL) =====
+async function confirmBooking(type) {
+  const d = doctors[currentDoctorIndex];
+  if (!d) return;
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    showToast('Please log in as a patient to book an appointment.', 'error');
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 1500);
     return;
   }
-  if (type === 'emergency') {
-    const desc = document.getElementById('emergencyDesc').value.trim();
+
+  if (type === 'normal') {
+    const dateInput = document.getElementById('appointmentDate');
+    const appointmentDate = dateInput ? dateInput.value : '';
+    const reason = document.getElementById('patientReason') ? document.getElementById('patientReason').value.trim() : '';
+
+    if (!appointmentDate) {
+      showToast('Please select an appointment date.', 'error');
+      return;
+    }
+
+    if (!selectedSlot) {
+      showToast('Please select an available time slot.', 'error');
+      return;
+    }
+
+    const payload = {
+      doctor_id: d.id,
+      appointment_date: appointmentDate,
+      appointment_time: selectedSlot,
+      reason: reason
+    };
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/appointments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        showToast(data.message || 'Booking failed. Slot may already be taken.', 'error');
+        // Refresh slots in case of double-booking conflict
+        fetchDoctorSlots(d.id, appointmentDate);
+        return;
+      }
+
+      closeBooking();
+      showToast('Appointment booked successfully! Status: Pending.', 'success');
+
+      // Refresh doctor slots
+      fetchDoctorSlots(d.id, appointmentDate);
+
+      // Open rating demo modal after delay
+      setTimeout(() => openRating(currentDoctorIndex), 2500);
+
+    } catch (err) {
+      showToast('Server error while booking. Please try again.', 'error');
+    }
+  } else {
+    // EMERGENCY BOOKING
+    const desc = document.getElementById('emergencyDesc') ? document.getElementById('emergencyDesc').value.trim() : '';
+    const location = document.getElementById('emergencyLocation') ? document.getElementById('emergencyLocation').value.trim() : '';
+    const name = document.getElementById('emergencyName') ? document.getElementById('emergencyName').value.trim() : '';
+    const phone = document.getElementById('emergencyPhone') ? document.getElementById('emergencyPhone').value.trim() : '';
+
     if (!desc) {
       showToast('Please describe the emergency.', 'error');
       return;
     }
-  }
 
-  closeBooking();
+    const payload = {
+      doctor_id: d.id,
+      description: desc,
+      location: location,
+      contact_name: name,
+      contact_phone: phone
+    };
 
-  if (type === 'normal') {
-    showToast('Appointment booked successfully!', 'success');
-    // After a moment, open rating modal as demo
-    setTimeout(() => openRating(currentDoctorIndex), 2500);
-  } else {
-    showToast('Emergency request sent! The doctor will respond shortly.', 'emergency');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/appointments/emergency`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        showToast(data.message || 'Emergency request failed. Please try again.', 'error');
+        return;
+      }
+
+      closeBooking();
+      // Clear description for next time
+      const descInput = document.getElementById('emergencyDesc');
+      if (descInput) descInput.value = '';
+
+      showToast(data.message || 'Emergency request sent! The doctor has been notified.', 'emergency');
+    } catch (err) {
+      showToast('Server error sending emergency request. Please try again.', 'error');
+    }
   }
 }
 
@@ -264,9 +537,13 @@ let selectedStars = 0;
 
 function openRating(i) {
   selectedStars = 0;
-  document.getElementById('ratingDoctorName').textContent = doctors[i].name;
+  const d = doctors[i];
+  if (!d) return;
+
+  document.getElementById('ratingDoctorName').textContent = d.name;
   document.getElementById('starLabel').textContent = 'Tap a star to rate';
-  document.getElementById('ratingComment').value = '';
+  const commentInput = document.getElementById('ratingComment');
+  if (commentInput) commentInput.value = '';
   document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('active'));
   document.getElementById('ratingModal').classList.add('open');
 }
@@ -275,14 +552,17 @@ function closeRating() {
   document.getElementById('ratingModal').classList.remove('open');
 }
 
-document.getElementById('ratingModal').addEventListener('click', function (e) {
-  if (e.target === this) closeRating();
-});
+const ratingModalEl = document.getElementById('ratingModal');
+if (ratingModalEl) {
+  ratingModalEl.addEventListener('click', function (e) {
+    if (e.target === this) closeRating();
+  });
+}
 
 function selectStar(val) {
   selectedStars = val;
   const labels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
-  document.getElementById('starLabel').textContent = labels[val];
+  document.getElementById('starLabel').textContent = labels[val] || '';
 
   document.querySelectorAll('.star-btn').forEach((s, i) => {
     s.classList.toggle('active', i < val);
@@ -301,20 +581,215 @@ function submitRating() {
 // ===== TOAST =====
 function showToast(message, type = 'success') {
   const toast = document.getElementById('toast');
+  if (!toast) return;
   const icon  = toast.querySelector('i');
 
   if (type === 'error') {
     toast.style.backgroundColor = '#c0392b';
-    icon.className = 'fa-solid fa-circle-exclamation';
+    if (icon) icon.className = 'fa-solid fa-circle-exclamation';
   } else if (type === 'emergency') {
     toast.style.backgroundColor = '#c0392b';
-    icon.className = 'fa-solid fa-triangle-exclamation';
+    if (icon) icon.className = 'fa-solid fa-triangle-exclamation';
   } else {
     toast.style.backgroundColor = '#2d7a3a';
-    icon.className = 'fa-solid fa-circle-check';
+    if (icon) icon.className = 'fa-solid fa-circle-check';
   }
 
-  document.getElementById('toastMsg').textContent = message;
+  const msgSpan = document.getElementById('toastMsg');
+  if (msgSpan) msgSpan.textContent = message;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3500);
 }
+
+// ===== APPOINTMENTS MODAL (PATIENT & DOCTOR MANAGEMENT) =====
+async function openAppointmentsModal() {
+  const token = localStorage.getItem('token');
+  const userJson = localStorage.getItem('user');
+
+  if (!token || !userJson) {
+    showToast('Please log in to view your appointments.', 'error');
+    setTimeout(() => { window.location.href = 'login.html'; }, 1200);
+    return;
+  }
+
+  const user = JSON.parse(userJson);
+  const isDoctor = user.role === 'doctor';
+  const modal = document.getElementById('appointmentsModal');
+  const subtitle = document.getElementById('appointmentsSubtitle');
+  const listContainer = document.getElementById('appointmentsList');
+
+  if (!modal || !listContainer) return;
+
+  subtitle.textContent = isDoctor 
+    ? 'Manage incoming patient appointment requests and updates.'
+    : 'View your scheduled doctor appointments and statuses.';
+
+  listContainer.innerHTML = '<span style="font-size:13px;color:var(--gray);">Loading appointments...</span>';
+  modal.classList.add('open');
+
+  const endpoint = isDoctor ? '/api/doctor/appointments' : '/api/patient/appointments';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+
+    if (!data.success || !data.appointments || data.appointments.length === 0) {
+      listContainer.innerHTML = `
+        <div style="text-align:center;padding:30px;color:var(--gray);">
+          <i class="fa-regular fa-calendar-xmark" style="font-size:32px;margin-bottom:10px;color:var(--steel);"></i>
+          <p>No appointments found.</p>
+        </div>
+      `;
+      return;
+    }
+
+    listContainer.innerHTML = data.appointments.map(a => {
+      const dateFormatted = a.appointment_date ? a.appointment_date.split('T')[0] : '';
+      const statusBadgeColors = {
+        pending: 'background:#fff8e1;color:#b7791f;',
+        confirmed: 'background:#e6f4ea;color:#2d7a3a;',
+        completed: 'background:#e5edf5;color:#284a6e;',
+        cancelled: 'background:#fdecea;color:#c0392b;'
+      };
+
+      const badgeStyle = statusBadgeColors[a.status] || statusBadgeColors.pending;
+
+      let actionsHtml = '';
+      if (isDoctor) {
+        if (a.status === 'pending') {
+          actionsHtml = `
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="confirm-btn" style="padding:6px 14px;font-size:12px;margin:0;background:#2d7a3a;" onclick="updateAppointmentStatus(${a.id}, 'confirmed')">
+                <i class="fa-solid fa-check"></i> Confirm
+              </button>
+              <button class="confirm-btn" style="padding:6px 14px;font-size:12px;margin:0;background:#c0392b;" onclick="updateAppointmentStatus(${a.id}, 'cancelled')">
+                <i class="fa-solid fa-xmark"></i> Reject
+              </button>
+            </div>
+          `;
+        } else if (a.status === 'confirmed') {
+          actionsHtml = `
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="confirm-btn" style="padding:6px 14px;font-size:12px;margin:0;" onclick="updateAppointmentStatus(${a.id}, 'completed')">
+                <i class="fa-solid fa-circle-check"></i> Mark Completed
+              </button>
+              <button class="confirm-btn" style="padding:6px 14px;font-size:12px;margin:0;background:#c0392b;" onclick="updateAppointmentStatus(${a.id}, 'cancelled')">
+                <i class="fa-solid fa-ban"></i> Cancel
+              </button>
+            </div>
+          `;
+        }
+      } else {
+        // Patient action
+        if (a.status === 'pending' || a.status === 'confirmed') {
+          actionsHtml = `
+            <div style="margin-top:10px;">
+              <button class="btn-outline" style="cursor:pointer;padding:5px 12px;font-size:12px;color:#c0392b;border-color:#f5c6c2;" onclick="updateAppointmentStatus(${a.id}, 'cancelled')">
+                <i class="fa-solid fa-ban"></i> Cancel Appointment
+              </button>
+            </div>
+          `;
+        }
+      }
+
+      const partyInfo = isDoctor
+        ? `<strong>Patient:</strong> ${a.patient_first_name} ${a.patient_last_name} (${a.patient_phone || 'No phone'})`
+        : `<strong>Doctor:</strong> ${a.doctor_name} — ${a.doctor_specialty || ''}`;
+
+      const emergencyBadge = a.is_emergency
+        ? `<span style="font-size:11px;font-weight:700;padding:4px 8px;border-radius:20px;text-transform:uppercase;background:#fdecea;color:#c0392b;margin-right:6px;"><i class="fa-solid fa-triangle-exclamation"></i> EMERGENCY</span>`
+        : '';
+
+      const locationHtml = a.emergency_location
+        ? `<div style="font-size:12px;color:var(--gray);margin-top:2px;"><i class="fa-solid fa-location-dot" style="color:#c0392b;"></i> <em>Location:</em> ${a.emergency_location}</div>`
+        : '';
+
+      return `
+        <div style="background:var(--alice);border:1px solid ${a.is_emergency ? '#f5c6c2' : 'var(--light-gray)'};border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:4px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:14px;color:var(--charcoal);">${partyInfo}</span>
+            <div style="display:flex;align-items:center;">
+              ${emergencyBadge}
+              <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;${badgeStyle}">
+                ${a.status}
+              </span>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--gray);margin-top:4px;">
+            <span><i class="fa-regular fa-calendar"></i> ${dateFormatted}</span> &nbsp;|&nbsp;
+            <span><i class="fa-regular fa-clock"></i> ${a.appointment_time}</span>
+          </div>
+          ${locationHtml}
+          ${a.reason ? `<div style="font-size:12px;color:var(--gray);margin-top:2px;"><em>Reason:</em> ${a.reason}</div>` : ''}
+          ${actionsHtml}
+        </div>
+      `;
+    }).join('');
+
+  } catch (err) {
+    listContainer.innerHTML = '<span style="font-size:13px;color:#c0392b;">Error loading appointments. Please try again.</span>';
+  }
+}
+
+async function updateAppointmentStatus(appointmentId, status) {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ status })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Appointment status updated to ${status}.`, 'success');
+      openAppointmentsModal(); // Refresh modal list
+    } else {
+      showToast(data.message || 'Status update failed.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while updating appointment.', 'error');
+  }
+}
+
+function closeAppointments() {
+  const modal = document.getElementById('appointmentsModal');
+  if (modal) modal.classList.remove('open');
+}
+
+const appointmentsModalEl = document.getElementById('appointmentsModal');
+if (appointmentsModalEl) {
+  appointmentsModalEl.addEventListener('click', function (e) {
+    if (e.target === this) closeAppointments();
+  });
+}
+
+// Initialise page: read URL query parameters if navigated from home page or elsewhere
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialSearch = urlParams.get('search');
+  const initialLocation = urlParams.get('location');
+
+  if (initialSearch) {
+    const searchInputEl = document.getElementById('searchInput');
+    if (searchInputEl) searchInputEl.value = initialSearch;
+  }
+
+  if (initialLocation) {
+    const locFilterEl = document.getElementById('locationFilter');
+    if (locFilterEl) locFilterEl.value = initialLocation.toLowerCase();
+  }
+
+  loadDoctors();
+
+  if (urlParams.get('view') === 'appointments') {
+    setTimeout(openAppointmentsModal, 300);
+  }
+});

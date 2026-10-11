@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — DoctorFinder</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="admin-body">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <i class="fa-solid fa-stethoscope"></i>
+      <span>Doctor<strong>Finder</strong></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="doctors.html">Doctors</a></li>
+      <li><a href="admin.html" class="active" style="color:var(--navy);font-weight:700;"><i class="fa-solid fa-shield-halved"></i> Admin</a></li>
+    </ul>
+    <div class="nav-actions">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="adminNameDisplay" style="font-size:14px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:6px;">
+          <i class="fa-solid fa-shield-halved"></i> Admin
+        </span>
+        <button id="adminLogoutBtn" class="btn-outline" style="cursor:pointer;padding:7px 14px;font-size:13px;background:none;">
+          <i class="fa-solid fa-right-from-bracket"></i> Log Out
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== ADMIN CONTAINER ===== -->
+  <main class="admin-container">
+
+    <div class="admin-header">
+      <div>
+        <h1><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</h1>
+        <p>System overview, doctor approvals, users, and appointments</p>
+      </div>
+      <button class="btn-refresh" onclick="loadAllAdminData()">
+        <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
+      </button>
+    </div>
+
+    <!-- ===== SUMMARY METRICS ===== -->
+    <div class="admin-stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="statPatients">0</h3>
+          <span>Total Patients</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa-solid fa-user-doctor"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="statDoctors">0</h3>
+          <span>Total Doctors</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon appt-icon">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="statAppointments">0</h3>
+          <span>Total Appointments</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon pending-icon">
+          <i class="fa-solid fa-hourglass-half"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="statPendingDoctors">0</h3>
+          <span>Pending Doctor Approvals</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TABS ===== -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchAdminTab('doctors', this)">
+        <i class="fa-solid fa-user-doctor"></i> Doctors Management
+      </button>
+      <button class="admin-tab" onclick="switchAdminTab('users', this)">
+        <i class="fa-solid fa-users"></i> Users List
+      </button>
+      <button class="admin-tab" onclick="switchAdminTab('appointments', this)">
+        <i class="fa-solid fa-calendar-days"></i> Appointments
+      </button>
+    </div>
+
+    <!-- ===== DOCTORS SECTION ===== -->
+    <section class="admin-section active" id="section-doctors">
+      <div class="section-top">
+        <h2>Doctors & Approval Status</h2>
+        <span style="font-size:12px;color:var(--gray);">Approve or reject doctor profiles</span>
+      </div>
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Doctor Name</th>
+              <th>Specialty</th>
+              <th>BMDC Reg. No</th>
+              <th>Email / Contact</th>
+              <th>Appointments</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="doctorsTableBody">
+            <tr>
+              <td colspan="8" class="empty-table"><i class="fa-solid fa-spinner fa-spin"></i> Loading doctors...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== USERS SECTION ===== -->
+    <section class="admin-section" id="section-users">
+      <div class="section-top">
+        <h2>Registered Users (Patients & Doctors)</h2>
+        <div>
+          <select id="userRoleFilter" onchange="loadUsers()" style="padding:6px 10px;border-radius:6px;border:1px solid var(--light-gray);font-size:13px;outline:none;">
+            <option value="all">All Roles</option>
+            <option value="patient">Patients</option>
+            <option value="doctor">Doctors</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Gender</th>
+              <th>Registered At</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr>
+              <td colspan="7" class="empty-table"><i class="fa-solid fa-spinner fa-spin"></i> Loading users...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== APPOINTMENTS SECTION ===== -->
+    <section class="admin-section" id="section-appointments">
+      <div class="section-top">
+        <h2>All Appointments & Emergencies</h2>
+        <span style="font-size:12px;color:var(--gray);">Tracks scheduled and emergency bookings</span>
+      </div>
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Patient</th>
+              <th>Doctor</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+              <th>Reason / Location</th>
+            </tr>
+          </thead>
+          <tbody id="appointmentsTableBody">
+            <tr>
+              <td colspan="7" class="empty-table"><i class="fa-solid fa-spinner fa-spin"></i> Loading appointments...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>

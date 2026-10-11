@@ -89,6 +89,9 @@
           <button class="role-tab" onclick="setRole('doctor', this)">
             <i class="fa-solid fa-user-doctor"></i> Doctor
           </button>
+          <button class="role-tab" onclick="setRole('admin', this)">
+            <i class="fa-solid fa-shield-halved"></i> Admin
+          </button>
         </div>
 
         <p class="role-hint" id="roleHint">Logging in as a <strong>Patient</strong></p>
@@ -125,7 +128,7 @@
             <label class="remember-me">
               <input type="checkbox" /> Remember me
             </label>
-            <a href="#" class="forgot-link">Forgot password?</a>
+            <a href="#" class="forgot-link" id="forgotPasswordLink">Forgot password?</a>
           </div>
 
           <!-- Error message -->
@@ -162,6 +165,106 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- ===== FORGOT PASSWORD MODAL ===== -->
+  <div class="modal-overlay" id="forgotModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeForgotModal()"><i class="fa-solid fa-xmark"></i></button>
+      <h2 style="font-size: 20px; font-weight: 700; color: var(--charcoal); margin-bottom: 6px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-key" style="color: var(--steel);"></i> Reset Password
+      </h2>
+      <p style="font-size: 13px; color: var(--gray); margin-bottom: 20px;">
+        Enter your registered email address and we'll send you instructions to reset your password.
+      </p>
+
+      <form class="auth-form" onsubmit="handleForgotPassword(event)">
+        <div class="form-group">
+          <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+          <input
+            type="email"
+            id="forgotEmail"
+            placeholder="e.g. yourname@email.com"
+            required
+          />
+        </div>
+
+        <div class="form-error" id="forgotError" style="display:none;">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="forgotErrorMsg"></span>
+        </div>
+
+        <div class="form-success" id="forgotSuccess" style="display:none;">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="forgotSuccessMsg"></span>
+        </div>
+
+        <button type="submit" class="auth-submit-btn" id="forgotBtn" style="margin-top: 10px;">
+          <span>Send Reset Link</span>
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== RESET PASSWORD MODAL (When URL contains ?token=...) ===== -->
+  <div class="modal-overlay" id="resetModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeResetModal()"><i class="fa-solid fa-xmark"></i></button>
+      <h2 style="font-size: 20px; font-weight: 700; color: var(--charcoal); margin-bottom: 6px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-lock" style="color: var(--steel);"></i> Set New Password
+      </h2>
+      <p style="font-size: 13px; color: var(--gray); margin-bottom: 20px;" id="resetSubtitle">
+        Enter your new password below.
+      </p>
+
+      <form class="auth-form" onsubmit="handleResetPassword(event)">
+        <div class="form-group">
+          <label><i class="fa-solid fa-lock"></i> New Password</label>
+          <div class="password-wrapper">
+            <input
+              type="password"
+              id="newPassword"
+              placeholder="Minimum 6 characters"
+              required
+            />
+            <button type="button" class="toggle-password" onclick="togglePassword('newPassword', this)">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-shield-halved"></i> Confirm New Password</label>
+          <div class="password-wrapper">
+            <input
+              type="password"
+              id="confirmNewPassword"
+              placeholder="Re-enter your password"
+              required
+            />
+            <button type="button" class="toggle-password" onclick="togglePassword('confirmNewPassword', this)">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-error" id="resetError" style="display:none;">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="resetErrorMsg"></span>
+        </div>
+
+        <div class="form-success" id="resetSuccess" style="display:none;">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="resetSuccessMsg"></span>
+        </div>
+
+        <button type="submit" class="auth-submit-btn" id="resetBtn" style="margin-top: 10px;">
+          <span>Update Password</span>
+          <i class="fa-solid fa-check"></i>
+        </button>
+      </form>
+    </div>
   </div>
 
   <!-- ===== SUCCESS TOAST ===== -->

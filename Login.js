@@ -32,7 +32,7 @@ function setRole(role, btn) {
 window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const roleParam = params.get('role');
-  if (roleParam && (roleParam === 'patient' || roleParam === 'doctor')) {
+  if (roleParam && (roleParam === 'patient' || roleParam === 'doctor' || roleParam === 'admin')) {
     setRole(roleParam);
   }
 });
@@ -117,7 +117,9 @@ async function handleLogin(event) {
 
     // Redirect user to the appropriate page based on role
     setTimeout(() => {
-      if (data.user.role === 'doctor') {
+      if (data.user.role === 'admin') {
+        window.location.href = 'admin.html';
+      } else if (data.user.role === 'doctor') {
         window.location.href = 'doctors.html';
       } else {
         window.location.href = 'index.html';
@@ -146,4 +148,239 @@ function showToast(message) {
   document.getElementById('toastMsg').textContent = message;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ===== FORGOT PASSWORD & RESET MODAL LOGIC =====
+let activeResetToken = null;
+
+function openForgotModal() {
+  const modal = document.getElementById('forgotModal');
+  const errorBox = document.getElementById('forgotError');
+  const successBox = document.getElementById('forgotSuccess');
+  if (errorBox) errorBox.style.display = 'none';
+  if (successBox) successBox.style.display = 'none';
+
+  // If user entered email on login form, pre-fill it
+  const loginEmail = document.getElementById('loginEmail');
+  const forgotEmail = document.getElementById('forgotEmail');
+  if (loginEmail && forgotEmail && !forgotEmail.value) {
+    forgotEmail.value = loginEmail.value.trim();
+  }
+
+  if (modal) modal.classList.add('open');
+}
+
+function closeForgotModal() {
+  const modal = document.getElementById('forgotModal');
+  if (modal) modal.classList.remove('open');
+}
+
+function openResetModal() {
+  const modal = document.getElementById('resetModal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeResetModal() {
+  const modal = document.getElementById('resetModal');
+  if (modal) modal.classList.remove('open');
+}
+
+// Attach listener to forgot password link
+const forgotLink = document.getElementById('forgotPasswordLink') || document.querySelector('.forgot-link');
+if (forgotLink) {
+  forgotLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    openForgotModal();
+  });
+}
+
+// Close modals when clicking outside
+const forgotModalOverlay = document.getElementById('forgotModal');
+if (forgotModalOverlay) {
+  forgotModalOverlay.addEventListener('click', function(e) {
+    if (e.target === this) closeForgotModal();
+  });
+}
+
+const resetModalOverlay = document.getElementById('resetModal');
+if (resetModalOverlay) {
+  resetModalOverlay.addEventListener('click', function(e) {
+    if (e.target === this) closeResetModal();
+  });
+}
+
+// Check URL for ?token= on load
+window.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (token) {
+    activeResetToken = token;
+    // Verify token with backend
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/verify-reset-token?token=${encodeURIComponent(token)}`);
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.message || 'Invalid or expired password reset link.', 'error');
+        const loginErrorBox = document.getElementById('loginError');
+        const loginErrorMsg = document.getElementById('loginErrorMsg');
+        if (loginErrorBox && loginErrorMsg) {
+          loginErrorMsg.textContent = data.message || 'Password reset link is invalid or expired. Please request a new one.';
+          loginErrorBox.style.display = 'flex';
+        }
+      } else {
+        const subtitle = document.getElementById('resetSubtitle');
+        if (subtitle && data.email) {
+          subtitle.innerHTML = `Resetting password for <strong>${data.email}</strong> (${data.role})`;
+        }
+        openResetModal();
+      }
+    } catch (err) {
+      console.error('Error verifying token:', err);
+    }
+  }
+});
+
+// Handle Forgot Password submission
+async function handleForgotPassword(event) {
+  event.preventDefault();
+
+  const emailInput = document.getElementById('forgotEmail');
+  const errorBox = document.getElementById('forgotError');
+  const errorMsg = document.getElementById('forgotErrorMsg');
+  const successBox = document.getElementById('forgotSuccess');
+  const successMsg = document.getElementById('forgotSuccessMsg');
+  const btn = document.getElementById('forgotBtn');
+
+  const email = emailInput ? emailInput.value.trim() : '';
+
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!email) {
+    errorMsg.textContent = 'Please enter your registered email address.';
+    errorBox.style.display = 'flex';
+    return;
+  }
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      errorMsg.textContent = data.message || 'Unable to process request. Please try again.';
+      errorBox.style.display = 'flex';
+      return;
+    }
+
+    successMsg.textContent = data.message;
+    successBox.style.display = 'flex';
+
+    if (emailInput) emailInput.value = '';
+
+    setTimeout(() => {
+      closeForgotModal();
+    }, 4000);
+
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    errorMsg.textContent = 'Unable to connect to server. Please try again.';
+    errorBox.style.display = 'flex';
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    btn.innerHTML = '<span>Send Reset Link</span><i class="fa-solid fa-paper-plane"></i>';
+  }
+}
+
+// Handle Reset Password submission
+async function handleResetPassword(event) {
+  event.preventDefault();
+
+  const newPassInput = document.getElementById('newPassword');
+  const confirmPassInput = document.getElementById('confirmNewPassword');
+  const errorBox = document.getElementById('resetError');
+  const errorMsg = document.getElementById('resetErrorMsg');
+  const successBox = document.getElementById('resetSuccess');
+  const successMsg = document.getElementById('resetSuccessMsg');
+  const btn = document.getElementById('resetBtn');
+
+  const newPassword = newPassInput ? newPassInput.value : '';
+  const confirmPassword = confirmPassInput ? confirmPassInput.value : '';
+
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!activeResetToken) {
+    errorMsg.textContent = 'Invalid or missing reset token.';
+    errorBox.style.display = 'flex';
+    return;
+  }
+
+  if (newPassword.length < 6) {
+    errorMsg.textContent = 'Password must be at least 6 characters.';
+    errorBox.style.display = 'flex';
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    errorMsg.textContent = 'Passwords do not match.';
+    errorBox.style.display = 'flex';
+    return;
+  }
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: activeResetToken,
+        new_password: newPassword,
+        confirm_password: confirmPassword
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      errorMsg.textContent = data.message || 'Password reset failed.';
+      errorBox.style.display = 'flex';
+      return;
+    }
+
+    successMsg.textContent = data.message;
+    successBox.style.display = 'flex';
+    showToast('Password updated! You can now log in.');
+
+    // Remove token from query parameters without reload
+    window.history.replaceState({}, document.title, window.location.pathname);
+    activeResetToken = null;
+
+    setTimeout(() => {
+      closeResetModal();
+      const loginPassword = document.getElementById('loginPassword');
+      if (loginPassword) loginPassword.focus();
+    }, 2000);
+
+  } catch (err) {
+    console.error('Reset password error:', err);
+    errorMsg.textContent = 'Unable to connect to server. Please try again.';
+    errorBox.style.display = 'flex';
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    btn.innerHTML = '<span>Update Password</span><i class="fa-solid fa-check"></i>';
+  }
 }

@@ -1,0 +1,30 @@
+# Environment variables — NEVER commit secrets
+.env
+.env.*
+!.env.example
+
+# Node dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Development / seed scripts (not for production)
+seed_27_doctors.js
+run_validation_suite.js
+test_browser_simulation.js
+
+# Backup / data files
+backup_before_27_doctors.json
+
+# Medical report uploads (private files — must never be public)
+doctor-reports/
+
+# OS and editor artefacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
