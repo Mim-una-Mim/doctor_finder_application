@@ -94,13 +94,27 @@ async function initDatabase() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT fk_appt_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE,
         CONSTRAINT fk_appt_patient FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE,
-        UNIQUE KEY uq_doc_date_time (doctor_id, appointment_date, appointment_time),
+        INDEX idx_doctor_date_time (doctor_id, appointment_date, appointment_time),
         INDEX idx_doctor (doctor_id),
         INDEX idx_patient (patient_id),
         INDEX idx_date (appointment_date),
         INDEX idx_status (status)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
+
+    // Safely remove unique constraint to allow up to 3 patients per hour slot
+    try {
+      await connection.query(`ALTER TABLE appointments DROP INDEX uq_doc_date_time`);
+    } catch (e) {
+      // Ignore if index already dropped or does not exist
+    }
+
+    // Ensure non-unique lookup index exists on (doctor_id, appointment_date, appointment_time)
+    try {
+      await connection.query(`ALTER TABLE appointments ADD INDEX idx_doctor_date_time (doctor_id, appointment_date, appointment_time)`);
+    } catch (e) {
+      // Ignore if index already exists
+    }
 
     // Ensure is_emergency and emergency_location columns exist on appointments
     try {

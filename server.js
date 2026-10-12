@@ -897,21 +897,29 @@ app.get('/api/doctors/:id/slots', async (req, res) => {
 
     // Fetch existing appointments for this doctor on this date (not cancelled)
     const [existingAppts] = await pool.query(
-      `SELECT appointment_time FROM appointments 
-       WHERE doctor_id = ? AND appointment_date = ? AND status != 'cancelled'`,
+      `SELECT appointment_time, COUNT(*) as booked_count FROM appointments 
+       WHERE doctor_id = ? AND appointment_date = ? AND status != 'cancelled'
+       GROUP BY appointment_time`,
       [doctorId, formattedDate]
     );
 
-    const bookedTimes = new Set(existingAppts.map((a) => a.appointment_time));
+    const bookedCountMap = {};
+    existingAppts.forEach((a) => {
+      bookedCountMap[a.appointment_time] = parseInt(a.booked_count) || 0;
+    });
 
-    // Construct slot list showing booked status
+    const MAX_CAPACITY = 3;
+
+    // Construct slot list showing booked status and remaining capacity
     const slots = candidateSlots.map((s) => {
-      const isBooked = bookedTimes.has(s.time);
+      const booked = bookedCountMap[s.time] || 0;
+      const remaining = Math.max(0, MAX_CAPACITY - booked);
+      const isFull = remaining === 0;
       return {
         time: s.label,
         raw_time: s.time,
-        full: isBooked,
-        seats: isBooked ? 0 : 3
+        full: isFull,
+        seats: remaining
       };
     });
 
@@ -974,17 +982,19 @@ app.post('/api/appointments', requireAuth, async (req, res) => {
     }
     const formattedDate = parsedDate.toISOString().split('T')[0];
 
-    // PREVENT DOUBLE BOOKING: Check whether this doctor already has an appointment for that date & time
+    // PREVENT CAPACITY OVERFLOW: Check active (non-cancelled) bookings for this doctor, date & time
+    const MAX_CAPACITY = 3;
     const [existing] = await pool.query(
-      `SELECT id FROM appointments 
+      `SELECT COUNT(*) as active_count FROM appointments 
        WHERE doctor_id = ? AND appointment_date = ? AND appointment_time = ? AND status != 'cancelled'`,
       [doctor_id, formattedDate, formattedTime]
     );
 
-    if (existing.length > 0) {
+    const activeBookings = parseInt(existing[0]?.active_count) || 0;
+    if (activeBookings >= MAX_CAPACITY) {
       return res.status(409).json({
         success: false,
-        message: 'This time slot is already booked for this doctor. Please choose a different slot or date.'
+        message: 'This time slot is fully booked (maximum 3 patients). Please choose a different slot or date.'
       });
     }
 
