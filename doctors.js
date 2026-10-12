@@ -1,7 +1,8 @@
 // ===== API CONFIGURATION =====
-// For cloud deployment, set window.CLOUD_API_URL in config.js (loaded before this file).
-// For local development, leave config.js empty — auto-detection below handles it.
-const API_BASE_URL = window.CLOUD_API_URL || ((window.location.port !== '5000') ? 'http://localhost:5000' : '');
+// Uses window.CLOUD_API_URL if configured; otherwise uses same origin on cloud (e.g. Render)
+// or port 5000, and falls back to http://localhost:5000 only on a local dev server (e.g. Live Server).
+const isLocalDevServer = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '5000';
+const API_BASE_URL = window.CLOUD_API_URL || (isLocalDevServer ? 'http://localhost:5000' : '');
 
 // Global memory array of doctors (loaded from MySQL backend)
 let doctors = [];
