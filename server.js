@@ -13,8 +13,21 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'doctor_finder_secret_key_default';
 
-// Middleware
-app.use(cors());
+// CORS: set ALLOWED_ORIGINS in .env as a comma-separated list for cloud deployment.
+// If not set, all origins are permitted (safe for local development).
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : null; // null = allow all
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!allowedOrigins || !origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    callback(new Error(`CORS: origin '${origin}' not allowed`));
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

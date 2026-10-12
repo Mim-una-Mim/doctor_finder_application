@@ -1,5 +1,7 @@
 // ===== ADMIN DASHBOARD JAVASCRIPT =====
-const API_BASE_URL = (window.location.port !== '5000') ? 'http://localhost:5000' : '';
+// For cloud deployment, set window.CLOUD_API_URL in config.js (loaded before this file).
+// For local development, leave config.js empty — auto-detection below handles it.
+const API_BASE_URL = window.CLOUD_API_URL || ((window.location.port !== '5000') ? 'http://localhost:5000' : '');
 
 // 1. Guard & Authentication Verification
 document.addEventListener('DOMContentLoaded', () => {
