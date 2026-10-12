@@ -28,3 +28,6 @@ doctor-reports/
 Thumbs.db
 .vscode/
 .idea/
+
+doctor_finder_backup.sql
+doctor_finder_db_backup.sql
