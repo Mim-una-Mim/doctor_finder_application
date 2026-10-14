@@ -1,17 +1,8 @@
 /* ===== ADMIN DASHBOARD STYLES ===== */
 :root {
-  --navy:       #284A6E;
-  --steel:      #3F6F98;
-  --slate:      #4F7EA8;
-  --alice:      #EEF5FC;
-  --sky:        #DCE9F6;
-  --charcoal:   #1E2D45;
-  --gray:       #5F6E82;
-  --white:      #FFFFFF;
-  --light-gray: #E5EDF5;
-  --green:      #2D7A3A;
-  --red:        #C0392B;
-  --amber:      #B7791F;
+  --violet:#502D55; --rose:#935073; --peach:#F6DBC0; --cream:#F8F4E9;
+  --navy:var(--violet); --steel:var(--rose); --slate:var(--rose); --alice:var(--cream);
+  --sky:var(--peach); --charcoal:var(--violet); --gray:var(--violet); --white:var(--cream); --light-gray:var(--peach); --green:var(--violet); --red:var(--rose); --amber:var(--rose);
 }
 
 body.admin-body {
@@ -81,12 +72,12 @@ body.admin-body {
 }
 
 .stat-icon.pending-icon {
-  background-color: #fff8e1;
+  background-color: #F6DBC0;
   color: var(--amber);
 }
 
 .stat-icon.appt-icon {
-  background-color: #e6f4ea;
+  background-color: #F6DBC0;
   color: var(--green);
 }
 
@@ -205,25 +196,25 @@ body.admin-body {
 }
 
 .badge-approved, .badge-confirmed {
-  background-color: #e6f4ea;
+  background-color: #F6DBC0;
   color: var(--green);
 }
 
 .badge-pending {
-  background-color: #fff8e1;
+  background-color: #F6DBC0;
   color: var(--amber);
 }
 
 .badge-rejected, .badge-cancelled {
-  background-color: #fdecea;
+  background-color: #F6DBC0;
   color: var(--red);
 }
 
 .badge-emergency {
-  background-color: #fdecea;
+  background-color: #F6DBC0;
   color: var(--red);
   font-weight: 800;
-  border: 1px solid #f5c6c2;
+  border: 1px solid #935073;
 }
 
 .badge-role-doctor {

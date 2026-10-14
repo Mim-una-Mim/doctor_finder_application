@@ -9,25 +9,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
-<body>
+<body class="home-page">
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <a href="index.html" class="nav-logo">
-      <i class="fa-solid fa-stethoscope"></i>
-      <span>Doctor<strong>Finder</strong></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="index.html" class="active">Home</a></li>
-      <li><a href="doctors.html">Doctors</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <div class="nav-actions">
-      <a href="login.html" class="btn-outline">Log In</a>
-      <a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Book Appointment</a>
-    </div>
+  <nav class="navbar sidebar-nav" aria-label="Main navigation">
+    <div class="nav-header"><a href="index.html" class="nav-logo"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctor<strong>Finder</strong></span></a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open navigation menu"><i class="fa-solid fa-bars" aria-hidden="true"></i></button></div>
+    <div class="nav-menu" id="primaryNav"><ul class="nav-links"><li><a href="index.html" class="active"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span></a></li><li><a href="doctors.html"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctors</span></a></li><li><a href="about.html"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>About</span></a></li><li><a href="#contact"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>Contact</span></a></li></ul><div class="nav-actions"><a href="login.html" class="btn-outline">Log In</a><a href="register.html" class="btn-outline register-nav-btn"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Register</a><a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Book Appointment</a></div></div>
   </nav>
+  <section class="home-search" aria-label="Search for a doctor"><div class="search-bar"><div class="search-field"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><label class="sr-only" for="heroSearch">Search by name, specialty, or hospital</label><input type="search" id="heroSearch" placeholder="Search by name, specialty, or hospital..." /></div><div class="search-divider" aria-hidden="true"></div><div class="search-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><label class="sr-only" for="heroLocation">Location</label><select id="heroLocation"><option value="Dinajpur">Dinajpur</option><option value="Sadar">Sadar</option><option value="Birampur">Birampur</option><option value="Parbatipur">Parbatipur</option></select></div><button class="search-btn" type="button">Search</button></div></section>
 
   <!-- HERO -->
   <section class="hero">
@@ -35,23 +23,6 @@
       <p class="hero-eyebrow">🏥 Dinajpur Local Healthcare Platform</p>
       <h1>Find Trusted Doctors in <span class="highlight">Dinajpur</span></h1>
       <p class="hero-sub">Search by name, specialty, or hospital and book an appointment with ease.</p>
-      <div class="search-bar">
-        <div class="search-field">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="heroSearch" placeholder="Search by name, specialty, or hospital..." />
-        </div>
-        <div class="search-divider"></div>
-        <div class="search-location">
-          <i class="fa-solid fa-location-dot"></i>
-          <select>
-            <option>Dinajpur</option>
-            <option>Sadar</option>
-            <option>Birampur</option>
-            <option>Parbatipur</option>
-          </select>
-        </div>
-        <button class="search-btn">Search</button>
-      </div>
       <div class="trust-badges">
         <div class="badge">
           <i class="fa-solid fa-shield-halved"></i>
@@ -69,11 +40,7 @@
     </div>
     <div class="hero-right">
       <div class="hero-image-wrapper">
-        <div class="hero-placeholder">
-          <i class="fa-solid fa-user-doctor"></i>
-          <span>Doctor Photo</span>
-          <small>Real photo coming soon</small>
-        </div>
+        <div class="medical-art" role="img" aria-label="Healthcare equipment illustration"><i class="fa-solid fa-plus art-cross"></i><i class="fa-solid fa-stethoscope art-stethoscope"></i><i class="fa-solid fa-prescription-bottle-medical art-bottle"></i><i class="fa-solid fa-syringe art-syringe"></i><i class="fa-solid fa-heart-pulse art-heart"></i><span class="art-caption">Care close to home</span></div>
         <div class="hero-badge-card">
           <i class="fa-solid fa-shield-halved"></i>
           <div><strong>Trusted Care</strong><span>Your health is our priority</span></div>
@@ -102,7 +69,7 @@
     <div class="doctor-cards">
 
       <div class="doctor-card">
-        <div class="doc-avatar" style="background:#DCE9F6;color:#284A6E;">RA</div>
+        <div class="doc-avatar avatar-violet">RA</div>
         <h3>Dr. Rahim Uddin</h3>
         <p class="specialty">Cardiologist</p>
         <p class="location"><i class="fa-solid fa-location-dot"></i> Dinajpur Medical Chamber</p>
@@ -111,7 +78,7 @@
       </div>
 
       <div class="doctor-card">
-        <div class="doc-avatar" style="background:#e8f5e9;color:#2d7a3a;">SI</div>
+        <div class="doc-avatar avatar-rose">SI</div>
         <h3>Dr. Sadia Islam</h3>
         <p class="specialty">Pediatrician</p>
         <p class="location"><i class="fa-solid fa-location-dot"></i> City Health Center</p>
@@ -120,7 +87,7 @@
       </div>
 
       <div class="doctor-card">
-        <div class="doc-avatar" style="background:#fff3e0;color:#e65100;">KH</div>
+        <div class="doc-avatar avatar-peach">KH</div>
         <h3>Dr. Kamal Hossain</h3>
         <p class="specialty">Dermatologist</p>
         <p class="location"><i class="fa-solid fa-location-dot"></i> Green Life Clinic</p>
@@ -129,7 +96,7 @@
       </div>
 
       <div class="doctor-card">
-        <div class="doc-avatar" style="background:#f3e5f5;color:#6a1b9a;">MP</div>
+        <div class="doc-avatar avatar-cream">MP</div>
         <h3>Dr. Mimuna Parvin</h3>
         <p class="specialty">Gynecologist</p>
         <p class="location"><i class="fa-solid fa-location-dot"></i> Sadar Hospital</p>
@@ -197,10 +164,7 @@
       <div class="footer-col">
         <h4>Subscribe</h4>
         <p>Get health tips to your inbox.</p>
-        <div class="newsletter">
-          <input type="email" placeholder="Enter your email" />
-          <button><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
+        <form class="newsletter" id="newsletterForm"><label class="sr-only" for="newsletterEmail">Email address</label><input type="email" id="newsletterEmail" placeholder="Enter your email" required /><button type="submit" aria-label="Submit newsletter email"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button></form><p class="newsletter-feedback" id="newsletterFeedback" aria-live="polite"></p>
       </div>
     </div>
     <div class="footer-bottom">

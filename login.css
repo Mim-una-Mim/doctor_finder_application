@@ -1,3 +1,4 @@
+:root { --violet:#502D55; --rose:#935073; --peach:#F6DBC0; --cream:#F8F4E9; }
                                                                                                                      /* ===== AUTH BODY ===== */
 .auth-body {
   background-color: var(--alice);
@@ -312,8 +313,8 @@
 
 /* Error message */
 .form-error {
-  background-color: #fdecea;
-  border: 1px solid #f5c6c2;
+  background-color: #F6DBC0;
+  border: 1px solid #935073;
   border-radius: 8px;
   padding: 10px 14px;
   display: flex;
@@ -406,11 +407,11 @@
 }
 
 .social-btn .fa-google {
-  color: #db4437;
+  color: #935073;
 }
 
 .social-btn .fa-facebook {
-  color: #1877f2;
+  color: #935073;
 }
 
 /* Footer note */
@@ -435,7 +436,7 @@
   position: fixed;
   bottom: 30px;
   right: 30px;
-  background-color: #2d7a3a;
+  background-color: #502D55;
   color: white;
   padding: 14px 20px;
   border-radius: 10px;
@@ -510,9 +511,9 @@
 }
 
 .form-success {
-  background-color: #e6f4ea;
-  border: 1px solid #b7e1cd;
-  color: #2d7a3a;
+  background-color: #F6DBC0;
+  border: 1px solid #935073;
+  color: #502D55;
   border-radius: 8px;
   padding: 10px 14px;
   display: flex;
@@ -520,3 +521,7 @@
   gap: 8px;
   font-size: 13px;
 }
+:focus-visible { outline:3px solid #935073 !important; outline-offset:3px; }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
+
+.auth-layout{flex-direction:row-reverse}.auth-medical-art{display:flex;align-items:center;justify-content:center;gap:clamp(16px,4vw,34px);min-height:150px;margin:22px 0;color:var(--violet)}.auth-medical-art i{display:grid;place-items:center;width:76px;height:76px;border-radius:22px;background:var(--peach);color:var(--violet);font-size:32px;box-shadow:0 8px 22px rgba(80,45,85,.12)}.auth-medical-art i:first-child{width:100px;height:100px;background:var(--violet);color:var(--cream);font-size:44px}@media(max-width:800px){.auth-layout{flex-direction:column-reverse}.auth-medical-art{min-height:90px;margin:12px 0}}

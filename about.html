@@ -10,23 +10,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
-<body>
+<body class="sidebar-page">
 
   <!-- NAVBAR -->
-  <nav class="navbar">
-    <a href="index.html" class="nav-logo">
-      <i class="fa-solid fa-stethoscope"></i>
-      <span>Doctor<strong>Finder</strong></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="doctors.html">Doctors</a></li>
-      <li><a href="about.html" class="active">About</a></li>
-      <li><a href="index.html#contact">Contact</a></li>
-    </ul>
-    <div class="nav-actions">
-      <a href="login.html" class="btn-outline">Log In</a>
-      <a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Book Appointment</a>
+  <nav class="navbar sidebar-nav" aria-label="Main navigation">
+    <div class="nav-header">
+      <a href="index.html" class="nav-logo"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctor<strong>Finder</strong></span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open navigation menu"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+    </div>
+    <div class="nav-menu" id="primaryNav">
+      <ul class="nav-links">
+        <li><a href="index.html" ><i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span></a></li>
+        <li><a href="doctors.html" ><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctors</span></a></li>
+        <li><a href="about.html" class="active"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>About</span></a></li>
+        <li><a href="index.html#contact"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>Contact</span></a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="login.html" class="btn-outline"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Log In</a><a href="register.html" class="btn-outline register-nav-btn"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Register</a>
+        <a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Book Appointment</a>
+      </div>
     </div>
   </nav>
 
@@ -47,14 +49,14 @@
         <p>Whether you're looking for a cardiologist, a pediatrician, or a general physician, DoctorFinder connects you instantly with verified, experienced doctors across Dinajpur and its surrounding areas.</p>
         <a href="doctors.html" class="about-cta-btn">Find a Doctor <i class="fa-solid fa-arrow-right"></i></a>
       </div>
-      <div class="about-image-box about-img-placeholder"><i class="fa-solid fa-user-doctor"></i><span>Team Photo Coming Soon</span></div>
+      <div class="about-image-box about-img-placeholder medical-composition" role="img" aria-label="Medical equipment illustration"><i class="fa-solid fa-kit-medical"></i><i class="fa-solid fa-syringe"></i><i class="fa-solid fa-prescription-bottle-medical"></i><span>Healthcare equipment</span></div>
     </div>
   </section>
 
   <!-- STATS -->
   <section class="about-stats">
     <div class="about-stat">
-      <i class="fa-solid fa-user-doctor"></i>
+      <i class="fa-solid fa-stethoscope"></i>
       <h3>150+</h3>
       <p>Verified Doctors</p>
     </div>
@@ -119,7 +121,7 @@
   <!-- HOW IT HELPS DOCTORS -->
   <section class="about-section doctor-section">
     <div class="about-two-col reverse">
-      <div class="about-image-box about-img-placeholder"><i class="fa-solid fa-stethoscope"></i><span>Doctor Photo Coming Soon</span></div>
+      <div class="about-image-box about-img-placeholder medical-composition" role="img" aria-label="Stethoscope and medical equipment illustration"><i class="fa-solid fa-stethoscope"></i><i class="fa-solid fa-heart-pulse"></i><i class="fa-solid fa-kit-medical"></i><span>Healthcare equipment</span></div>
       <div class="about-text">
         <p class="section-eyebrow">For Doctors</p>
         <h2>Grow Your Practice with DoctorFinder</h2>

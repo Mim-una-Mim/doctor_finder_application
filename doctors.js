@@ -20,10 +20,10 @@ function getInitials(name) {
 
 // Avatar palette matching existing theme
 const avatarStyles = [
-  'background:#DCE9F6;color:#284A6E;',
-  'background:#e8f5e9;color:#2d7a3a;',
-  'background:#fff3e0;color:#e65100;',
-  'background:#f3e5f5;color:#6a1b9a;'
+  'background:#F6DBC0;color:#502D55;',
+  'background:#F6DBC0;color:#502D55;',
+  'background:#F6DBC0;color:#935073;',
+  'background:#F6DBC0;color:#502D55;'
 ];
 
 // ===== RENDER DOCTOR CARDS =====
@@ -63,7 +63,7 @@ function renderDoctorCards(list) {
         <div class="card-top">
           <div>
             <h3>${d.name}</h3>
-            <p class="specialty"><i class="fa-solid fa-user-doctor"></i> ${d.specialty}</p>
+            <p class="specialty"><i class="fa-solid fa-stethoscope"></i> ${d.specialty}</p>
             <p class="hospital"><i class="fa-solid fa-hospital"></i> ${d.hospital || 'Dinajpur Chamber'}</p>
           </div>
           <span class="fees-badge">৳${d.fees || 500}</span>
@@ -265,7 +265,7 @@ function openProfile(i) {
 
   const modalAvatar = document.getElementById('modalAvatar');
   modalAvatar.textContent = d.avatarText;
-  modalAvatar.style.cssText = d.avatarStyle + 'width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;flex-shrink:0;border:3px solid #E5EDF5;';
+  modalAvatar.style.cssText = d.avatarStyle + 'width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;flex-shrink:0;border:3px solid #F6DBC0;';
 
   document.getElementById('modalName').textContent = d.name;
   document.getElementById('modalSpecialty').textContent = '🩺 ' + d.specialty + (d.degree ? ` (${d.degree})` : '');
@@ -593,7 +593,7 @@ function showToast(message, type = 'success') {
     toast.style.backgroundColor = '#c0392b';
     if (icon) icon.className = 'fa-solid fa-triangle-exclamation';
   } else {
-    toast.style.backgroundColor = '#2d7a3a';
+    toast.style.backgroundColor = '#502D55';
     if (icon) icon.className = 'fa-solid fa-circle-check';
   }
 
@@ -650,10 +650,10 @@ async function openAppointmentsModal() {
     listContainer.innerHTML = data.appointments.map(a => {
       const dateFormatted = a.appointment_date ? a.appointment_date.split('T')[0] : '';
       const statusBadgeColors = {
-        pending: 'background:#fff8e1;color:#b7791f;',
-        confirmed: 'background:#e6f4ea;color:#2d7a3a;',
-        completed: 'background:#e5edf5;color:#284a6e;',
-        cancelled: 'background:#fdecea;color:#c0392b;'
+        pending: 'background:#F6DBC0;color:#502D55;',
+        confirmed: 'background:#F6DBC0;color:#502D55;',
+        completed: 'background:#F6DBC0;color:#502D55;',
+        cancelled: 'background:#F6DBC0;color:#c0392b;'
       };
 
       const badgeStyle = statusBadgeColors[a.status] || statusBadgeColors.pending;
@@ -663,7 +663,7 @@ async function openAppointmentsModal() {
         if (a.status === 'pending') {
           actionsHtml = `
             <div style="display:flex;gap:8px;margin-top:10px;">
-              <button class="confirm-btn" style="padding:6px 14px;font-size:12px;margin:0;background:#2d7a3a;" onclick="updateAppointmentStatus(${a.id}, 'confirmed')">
+              <button class="confirm-btn" style="padding:6px 14px;font-size:12px;margin:0;background:#502D55;" onclick="updateAppointmentStatus(${a.id}, 'confirmed')">
                 <i class="fa-solid fa-check"></i> Confirm
               </button>
               <button class="confirm-btn" style="padding:6px 14px;font-size:12px;margin:0;background:#c0392b;" onclick="updateAppointmentStatus(${a.id}, 'cancelled')">
@@ -688,7 +688,7 @@ async function openAppointmentsModal() {
         if (a.status === 'pending' || a.status === 'confirmed') {
           actionsHtml = `
             <div style="margin-top:10px;">
-              <button class="btn-outline" style="cursor:pointer;padding:5px 12px;font-size:12px;color:#c0392b;border-color:#f5c6c2;" onclick="updateAppointmentStatus(${a.id}, 'cancelled')">
+              <button class="btn-outline" style="cursor:pointer;padding:5px 12px;font-size:12px;color:#c0392b;border-color:#935073;" onclick="updateAppointmentStatus(${a.id}, 'cancelled')">
                 <i class="fa-solid fa-ban"></i> Cancel Appointment
               </button>
             </div>
@@ -701,7 +701,7 @@ async function openAppointmentsModal() {
         : `<strong>Doctor:</strong> ${a.doctor_name} — ${a.doctor_specialty || ''}`;
 
       const emergencyBadge = a.is_emergency
-        ? `<span style="font-size:11px;font-weight:700;padding:4px 8px;border-radius:20px;text-transform:uppercase;background:#fdecea;color:#c0392b;margin-right:6px;"><i class="fa-solid fa-triangle-exclamation"></i> EMERGENCY</span>`
+        ? `<span style="font-size:11px;font-weight:700;padding:4px 8px;border-radius:20px;text-transform:uppercase;background:#F6DBC0;color:#c0392b;margin-right:6px;"><i class="fa-solid fa-triangle-exclamation"></i> EMERGENCY</span>`
         : '';
 
       const locationHtml = a.emergency_location
@@ -709,7 +709,7 @@ async function openAppointmentsModal() {
         : '';
 
       return `
-        <div style="background:var(--alice);border:1px solid ${a.is_emergency ? '#f5c6c2' : 'var(--light-gray)'};border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:4px;">
+        <div style="background:var(--alice);border:1px solid ${a.is_emergency ? '#935073' : 'var(--light-gray)'};border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:4px;">
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <span style="font-size:14px;color:var(--charcoal);">${partyInfo}</span>
             <div style="display:flex;align-items:center;">
