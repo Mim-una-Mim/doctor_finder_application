@@ -2,7 +2,7 @@
 function executeHeroSearch() {
   const heroSearchInput = document.getElementById('heroSearch');
   const term = heroSearchInput ? heroSearchInput.value.trim() : '';
-  const heroLocSelect = document.querySelector('.hero .search-location select');
+  const heroLocSelect = document.getElementById('heroLocation');
   const loc = heroLocSelect ? heroLocSelect.value.trim() : '';
   const params = new URLSearchParams();
   if (term) params.append('search', term);
@@ -14,7 +14,7 @@ function executeHeroSearch() {
 
 const heroSearch = document.getElementById('heroSearch');
 if (heroSearch) {
-  heroSearch.addEventListener('keypress', function (e) {
+  heroSearch.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
       e.preventDefault();
       executeHeroSearch();
@@ -22,7 +22,7 @@ if (heroSearch) {
   });
 }
 
-const heroSearchBtn = document.querySelector('.hero .search-btn');
+const heroSearchBtn = document.querySelector('.home-search .search-btn');
 if (heroSearchBtn) {
   heroSearchBtn.removeAttribute('onclick');
   heroSearchBtn.addEventListener('click', function (e) {
@@ -42,7 +42,7 @@ function initAuthNavbar() {
     if (!navActions) return;
 
     const roleBadge = user.role === 'admin' ? 'Admin' : (user.role === 'doctor' ? 'Dr.' : 'Patient');
-    const roleIcon = user.role === 'admin' ? 'fa-shield-halved' : (user.role === 'doctor' ? 'fa-user-doctor' : 'fa-circle-user');
+    const roleIcon = user.role === 'admin' ? 'fa-shield-halved' : (user.role === 'doctor' ? 'fa-stethoscope' : 'fa-circle-user');
     const extraActionBtn = user.role === 'admin' 
       ? `<a href="admin.html" class="btn-primary" style="padding:7px 14px;font-size:13px;text-decoration:none;"><i class="fa-solid fa-chart-line"></i> Dashboard</a>`
       : `<button id="navApptsBtn" class="btn-outline" style="cursor:pointer;padding:7px 14px;font-size:13px;background:none;"><i class="fa-regular fa-calendar-check"></i> Appointments</button>`;
@@ -88,3 +88,7 @@ function initAuthNavbar() {
 }
 
 document.addEventListener('DOMContentLoaded', initAuthNavbar);
+const navToggle=document.querySelector('.nav-toggle');
+if(navToggle) navToggle.addEventListener('click',()=>{const navbar=document.querySelector('.navbar');const open=navbar.classList.toggle('menu-open');navToggle.setAttribute('aria-expanded',String(open));navToggle.setAttribute('aria-label',open?'Close navigation menu':'Open navigation menu');navToggle.innerHTML='<i class="fa-solid '+(open?'fa-xmark':'fa-bars')+'" aria-hidden="true"></i>';});
+document.querySelectorAll('.nav-menu a').forEach((link)=>link.addEventListener('click',()=>{const navbar=document.querySelector('.navbar');if(navbar)navbar.classList.remove('menu-open');if(navToggle){navToggle.setAttribute('aria-expanded','false');navToggle.setAttribute('aria-label','Open navigation menu');}}));
+const newsletterForm=document.getElementById('newsletterForm');if(newsletterForm)newsletterForm.addEventListener('submit',(event)=>{event.preventDefault();document.getElementById('newsletterFeedback').textContent='Thanks! This demo does not send or save email addresses.';newsletterForm.reset();});

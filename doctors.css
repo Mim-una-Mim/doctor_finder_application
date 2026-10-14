@@ -1,3 +1,4 @@
+:root { --violet:#502D55; --rose:#935073; --peach:#F6DBC0; --cream:#F8F4E9; }
 
 
 
@@ -239,13 +240,13 @@
 }
 
 .tag.available {
-  background-color: #e6f4ea;
-  color: #2d7a3a;
+  background-color: #F6DBC0;
+  color: #502D55;
   font-weight: 600;
 }
 
 .tag.unavailable {
-  background-color: #fdecea;
+  background-color: #F6DBC0;
   color: #c0392b;
   font-weight: 600;
 }
@@ -544,7 +545,7 @@
   position: fixed;
   bottom: 30px;
   right: 30px;
-  background-color: #2d7a3a;
+  background-color: #502D55;
   color: white;
   padding: 14px 20px;
   border-radius: 10px;
@@ -597,12 +598,12 @@
 
 /* ===== RATING TAG ===== */
 .rating-tag {
-  background-color: #fff8e1 !important;
-  color: #b7791f !important;
+  background-color: #F6DBC0 !important;
+  color: #502D55 !important;
 }
 
 .rating-tag i {
-  color: #f6ad55;
+  color: #935073;
 }
 
 .rating-count {
@@ -723,7 +724,7 @@
 }
 
 .booking-type-tab.emergency {
-  border-color: #f5c6c2;
+  border-color: #935073;
   color: #c0392b;
 }
 
@@ -738,8 +739,8 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  background-color: #fdecea;
-  border: 1px solid #f5c6c2;
+  background-color: #F6DBC0;
+  border: 1px solid #935073;
   border-radius: 10px;
   padding: 14px 16px;
   margin-bottom: 16px;
@@ -761,7 +762,7 @@
 
 .emergency-banner span {
   font-size: 12px;
-  color: #6c3535;
+  color: #502D55;
   line-height: 1.5;
 }
 
@@ -770,7 +771,7 @@
 }
 
 .emergency-confirm-btn:hover {
-  background-color: #922b21 !important;
+  background-color: #502D55 !important;
 }
 
 /* ===== REVIEWS ===== */
@@ -820,7 +821,7 @@
 }
 
 .review-stars {
-  color: #f6ad55;
+  color: #935073;
   font-size: 11px;
 }
 
@@ -851,7 +852,7 @@
 
 .star-btn:hover,
 .star-btn.active {
-  color: #f6ad55;
+  color: #935073;
   transform: scale(1.2);
 }
 
@@ -897,8 +898,8 @@
 /* ===== HOMEPAGE CARD RATING ===== */
 .card-rating {
   font-size: 12px;
-  color: #b7791f;
-  background-color: #fff8e1;
+  color: #502D55;
+  background-color: #F6DBC0;
   padding: 3px 8px;
   border-radius: 12px;
   margin-bottom: 12px;
@@ -906,6 +907,10 @@
 }
 
 .card-rating i {
-  color: #f6ad55;
+  color: #935073;
   font-size: 11px;
 }
+:focus-visible { outline:3px solid #935073 !important; outline-offset:3px; }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
+
+.doc-avatar-lg{background:var(--peach)!important;color:var(--violet)!important;border-color:var(--rose)!important}

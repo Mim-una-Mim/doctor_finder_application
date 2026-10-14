@@ -9,23 +9,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
-<body class="auth-body">
+<body class="auth-body sidebar-page">
 
   <!-- ===== NAVBAR ===== -->
-  <nav class="navbar">
-    <a href="index.html" class="nav-logo">
-      <i class="fa-solid fa-stethoscope"></i>
-      <span>Doctor<strong>Finder</strong></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="doctors.html">Doctors</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="index.html#contact">Contact</a></li>
-    </ul>
-    <div class="nav-actions">
-      <a href="login.html" class="btn-outline">Log In</a>
-      <a href="register.html" class="btn-primary"><i class="fa-solid fa-user-plus"></i> Register</a>
+  <nav class="navbar sidebar-nav" aria-label="Main navigation">
+    <div class="nav-header">
+      <a href="index.html" class="nav-logo"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctor<strong>Finder</strong></span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open navigation menu"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+    </div>
+    <div class="nav-menu" id="primaryNav">
+      <ul class="nav-links">
+        <li><a href="index.html" ><i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span></a></li>
+        <li><a href="doctors.html" ><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctors</span></a></li>
+        <li><a href="about.html" ><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>About</span></a></li>
+        <li><a href="index.html#contact"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>Contact</span></a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="login.html" class="btn-outline"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Log In</a><a href="register.html" class="btn-outline register-nav-btn"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Register</a>
+        <a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Book Appointment</a>
+      </div>
     </div>
   </nav>
 
@@ -39,7 +41,8 @@
           <i class="fa-solid fa-stethoscope"></i>
           <span>Doctor<strong>Finder</strong></span>
         </div>
-        <h2>Welcome back!</h2>
+        <h2>Welcome back</h2>
+        <div class="auth-medical-art" role="img" aria-label="Healthcare equipment illustration"><i class="fa-solid fa-stethoscope"></i><i class="fa-solid fa-heart-pulse"></i><i class="fa-solid fa-kit-medical"></i></div>
         <p>Log in to manage your appointments, view your health history, and connect with trusted doctors in Dinajpur.</p>
 
         <div class="auth-features">
@@ -57,20 +60,7 @@
           </div>
         </div>
 
-        <div class="auth-stats">
-          <div class="auth-stat">
-            <strong>150+</strong>
-            <span>Doctors</span>
-          </div>
-          <div class="auth-stat">
-            <strong>5,000+</strong>
-            <span>Patients</span>
-          </div>
-          <div class="auth-stat">
-            <strong>10+</strong>
-            <span>Hospitals</span>
-          </div>
-        </div>
+        
       </div>
     </div>
 
@@ -84,10 +74,10 @@
         <!-- Role Tabs -->
         <div class="role-tabs">
           <button class="role-tab active" onclick="setRole('patient', this)">
-            <i class="fa-solid fa-user"></i> Patient
+            <i class="fa-solid fa-id-card"></i> Patient
           </button>
           <button class="role-tab" onclick="setRole('doctor', this)">
-            <i class="fa-solid fa-user-doctor"></i> Doctor
+            <i class="fa-solid fa-stethoscope"></i> Doctor
           </button>
           <button class="role-tab" onclick="setRole('admin', this)">
             <i class="fa-solid fa-shield-halved"></i> Admin
@@ -273,6 +263,7 @@
     <span id="toastMsg">Logged in successfully!</span>
   </div>
 
+  <script src="script.js"></script>
   <script src="login.js"></script>
 </body>
 </html>

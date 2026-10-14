@@ -11,23 +11,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
-<body>
+<body class="sidebar-page">
 
   <!-- NAVBAR -->
-  <nav class="navbar">
-    <a href="index.html" class="nav-logo">
-      <i class="fa-solid fa-stethoscope"></i>
-      <span>Doctor<strong>Finder</strong></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="doctors.html" class="active">Doctors</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="index.html#contact">Contact</a></li>
-    </ul>
-    <div class="nav-actions">
-      <a href="login.html" class="btn-outline">Log In</a>
-      <a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Book Appointment</a>
+  <nav class="navbar sidebar-nav" aria-label="Main navigation">
+    <div class="nav-header">
+      <a href="index.html" class="nav-logo"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctor<strong>Finder</strong></span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open navigation menu"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+    </div>
+    <div class="nav-menu" id="primaryNav">
+      <ul class="nav-links">
+        <li><a href="index.html" ><i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span></a></li>
+        <li><a href="doctors.html" class="active"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctors</span></a></li>
+        <li><a href="about.html" ><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>About</span></a></li>
+        <li><a href="index.html#contact"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>Contact</span></a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="login.html" class="btn-outline"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Log In</a><a href="register.html" class="btn-outline register-nav-btn"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Register</a>
+        <a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Book Appointment</a>
+      </div>
     </div>
   </nav>
 
@@ -99,12 +101,12 @@
 
         <!-- Doctor 1 -->
         <div class="doctor-card-lg" data-specialty="Cardiologist" data-hospital="Dinajpur Medical Chamber" data-name="Dr. Rahim Uddin" data-fees="500" data-rating="4.5">
-          <div class="doc-avatar-lg" style="background:#DCE9F6;color:#284A6E;">RU</div>
+          <div class="doc-avatar-lg" style="background:#F6DBC0;color:#502D55;">RU</div>
           <div class="card-info">
             <div class="card-top">
               <div>
                 <h3>Dr. Rahim Uddin</h3>
-                <p class="specialty"><i class="fa-solid fa-user-doctor"></i> Cardiologist</p>
+                <p class="specialty"><i class="fa-solid fa-stethoscope"></i> Cardiologist</p>
                 <p class="hospital"><i class="fa-solid fa-hospital"></i> Dinajpur Medical Chamber</p>
               </div>
               <span class="fees-badge">৳500</span>
@@ -123,12 +125,12 @@
 
         <!-- Doctor 2 -->
         <div class="doctor-card-lg" data-specialty="Pediatrician" data-hospital="City Health Center" data-name="Dr. Sadia Islam" data-fees="400" data-rating="4.7">
-          <div class="doc-avatar-lg" style="background:#e8f5e9;color:#2d7a3a;">SI</div>
+          <div class="doc-avatar-lg" style="background:#F6DBC0;color:#502D55;">SI</div>
           <div class="card-info">
             <div class="card-top">
               <div>
                 <h3>Dr. Sadia Islam</h3>
-                <p class="specialty"><i class="fa-solid fa-user-doctor"></i> Pediatrician</p>
+                <p class="specialty"><i class="fa-solid fa-stethoscope"></i> Pediatrician</p>
                 <p class="hospital"><i class="fa-solid fa-hospital"></i> City Health Center</p>
               </div>
               <span class="fees-badge">৳400</span>
@@ -147,12 +149,12 @@
 
         <!-- Doctor 3 -->
         <div class="doctor-card-lg" data-specialty="Dermatologist" data-hospital="Green Life Clinic" data-name="Dr. Kamal Hossain" data-fees="600" data-rating="4.3">
-          <div class="doc-avatar-lg" style="background:#fff3e0;color:#e65100;">KH</div>
+          <div class="doc-avatar-lg" style="background:#F6DBC0;color:#935073;">KH</div>
           <div class="card-info">
             <div class="card-top">
               <div>
                 <h3>Dr. Kamal Hossain</h3>
-                <p class="specialty"><i class="fa-solid fa-user-doctor"></i> Dermatologist</p>
+                <p class="specialty"><i class="fa-solid fa-stethoscope"></i> Dermatologist</p>
                 <p class="hospital"><i class="fa-solid fa-hospital"></i> Green Life Clinic</p>
               </div>
               <span class="fees-badge">৳600</span>
@@ -171,12 +173,12 @@
 
         <!-- Doctor 4 -->
         <div class="doctor-card-lg" data-specialty="Gynecologist" data-hospital="Sadar Hospital" data-name="Dr. Mimuna Parvin" data-fees="500" data-rating="4.8">
-          <div class="doc-avatar-lg" style="background:#f3e5f5;color:#6a1b9a;">MP</div>
+          <div class="doc-avatar-lg" style="background:#F6DBC0;color:#502D55;">MP</div>
           <div class="card-info">
             <div class="card-top">
               <div>
                 <h3>Dr. Mimuna Parvin</h3>
-                <p class="specialty"><i class="fa-solid fa-user-doctor"></i> Gynecologist</p>
+                <p class="specialty"><i class="fa-solid fa-stethoscope"></i> Gynecologist</p>
                 <p class="hospital"><i class="fa-solid fa-hospital"></i> Sadar Hospital</p>
               </div>
               <span class="fees-badge">৳500</span>

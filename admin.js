@@ -243,7 +243,7 @@ async function loadAppointments() {
       const dateFormatted = a.appointment_date ? a.appointment_date.split('T')[0] : '';
       const typeBadge = a.is_emergency
         ? `<span class="badge badge-emergency"><i class="fa-solid fa-triangle-exclamation"></i> EMERGENCY</span>`
-        : `<span class="badge" style="background:#e5edf5;color:#284a6e;">NORMAL</span>`;
+        : `<span class="badge" style="background:#F6DBC0;color:#502D55;">NORMAL</span>`;
 
       const statusBadgeClass = `badge-${a.status}`;
 

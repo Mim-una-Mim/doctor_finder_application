@@ -1,3 +1,4 @@
+:root { --violet:#502D55; --rose:#935073; --peach:#F6DBC0; --cream:#F8F4E9; }
                                                                                                                              /* ===== REGISTER RIGHT PANEL (scrollable) ===== */
 .register-right {
   align-items: flex-start;
@@ -46,7 +47,7 @@
   width: 100%;
   transition: border-color 0.2s, box-shadow 0.2s;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235F6E82' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23502D55' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
 }
@@ -161,3 +162,5 @@
 .checkbox-label a:hover {
   text-decoration: underline;
 }
+:focus-visible { outline:3px solid #935073 !important; outline-offset:3px; }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
