@@ -1225,7 +1225,7 @@ app.patch('/api/appointments/:id/status', requireAuth, async (req, res) => {
     const appointmentId = parseInt(req.params.id);
     const { status } = req.body;
 
-    const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
+    const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled', 'no-show'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ success: false, message: 'Invalid appointment status.' });
     }
@@ -1254,12 +1254,26 @@ app.patch('/api/appointments/:id/status', requireAuth, async (req, res) => {
       });
     }
 
+    // Explicit restriction: ONLY the owning doctor can mark no-show
+    if (status === 'no-show' && !isDoctorOwner) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized. Only the assigned doctor can mark an appointment as no-show.'
+      });
+    }
+
     // Status transition validation
     if (appt.status === 'completed' && status !== 'completed') {
       return res.status(400).json({ success: false, message: 'Cannot change status of a completed appointment.' });
     }
     if (appt.status === 'cancelled' && status !== 'cancelled') {
       return res.status(400).json({ success: false, message: 'Cannot modify a cancelled appointment.' });
+    }
+    if (appt.status === 'no-show' && status !== 'no-show') {
+      return res.status(400).json({ success: false, message: 'Cannot modify an appointment marked as no-show.' });
+    }
+    if (status === 'no-show' && appt.status !== 'confirmed') {
+      return res.status(400).json({ success: false, message: 'Only confirmed appointments can be marked as no-show.' });
     }
 
     await pool.query('UPDATE appointments SET status = ? WHERE id = ?', [status, appointmentId]);

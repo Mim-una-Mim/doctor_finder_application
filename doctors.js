@@ -653,7 +653,8 @@ async function openAppointmentsModal() {
         pending: 'background:#F6DBC0;color:#502D55;',
         confirmed: 'background:#F6DBC0;color:#502D55;',
         completed: 'background:#F6DBC0;color:#502D55;',
-        cancelled: 'background:#F6DBC0;color:#c0392b;'
+        cancelled: 'background:#F6DBC0;color:#c0392b;',
+        'no-show': 'background:#F6DBC0;color:#7f8c8d;'
       };
 
       const badgeStyle = statusBadgeColors[a.status] || statusBadgeColors.pending;
@@ -673,9 +674,12 @@ async function openAppointmentsModal() {
           `;
         } else if (a.status === 'confirmed') {
           actionsHtml = `
-            <div style="display:flex;gap:8px;margin-top:10px;">
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
               <button class="confirm-btn" style="padding:6px 14px;font-size:12px;margin:0;" onclick="updateAppointmentStatus(${a.id}, 'completed')">
                 <i class="fa-solid fa-circle-check"></i> Mark Completed
+              </button>
+              <button class="confirm-btn" style="padding:6px 14px;font-size:12px;margin:0;background:#7f8c8d;" onclick="updateAppointmentStatus(${a.id}, 'no-show')">
+                <i class="fa-solid fa-user-slash"></i> Mark No-show
               </button>
               <button class="confirm-btn" style="padding:6px 14px;font-size:12px;margin:0;background:#c0392b;" onclick="updateAppointmentStatus(${a.id}, 'cancelled')">
                 <i class="fa-solid fa-ban"></i> Cancel

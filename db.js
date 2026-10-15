@@ -92,7 +92,7 @@ async function initDatabase() {
         appointment_date DATE NOT NULL,
         appointment_time TIME NOT NULL,
         reason TEXT DEFAULT NULL,
-        status ENUM('pending', 'confirmed', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
+        status ENUM('pending', 'confirmed', 'completed', 'cancelled', 'no-show') NOT NULL DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT fk_appt_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE,
         CONSTRAINT fk_appt_patient FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -103,6 +103,25 @@ async function initDatabase() {
         INDEX idx_status (status)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
+
+    // Safely ensure appointments.status ENUM includes 'no-show' idempotently
+    try {
+      const [colInfo] = await connection.query(`
+        SELECT COLUMN_TYPE 
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_SCHEMA = DATABASE() 
+          AND TABLE_NAME = 'appointments' 
+          AND COLUMN_NAME = 'status'
+      `);
+      if (colInfo.length > 0 && !colInfo[0].COLUMN_TYPE.includes("'no-show'")) {
+        await connection.query(`
+          ALTER TABLE appointments 
+          MODIFY COLUMN status ENUM('pending', 'confirmed', 'completed', 'cancelled', 'no-show') NOT NULL DEFAULT 'pending'
+        `);
+      }
+    } catch (e) {
+      // Ignore if schema check or alter encounters permission or structure issue
+    }
 
     // Safely remove unique constraint to allow up to 3 patients per hour slot
     try {
