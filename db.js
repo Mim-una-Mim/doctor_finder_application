@@ -165,6 +165,67 @@ async function initDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
+    // 7. medical_records table (Patient Medical Vault)
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS medical_records (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        patient_id INT NOT NULL,
+        record_type ENUM('report', 'previous_prescription') NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        doctor_or_lab VARCHAR(255) DEFAULT NULL,
+        record_date DATE NOT NULL,
+        original_filename VARCHAR(255) NOT NULL,
+        stored_filename VARCHAR(255) NOT NULL UNIQUE,
+        mime_type VARCHAR(100) NOT NULL,
+        file_size_bytes INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_mr_patient FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE,
+        INDEX idx_mr_patient_created (patient_id, created_at),
+        INDEX idx_mr_type (record_type)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // 8. appointment_record_access table (Patient-Controlled Doctor Access with Snapshot Cutoff)
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS appointment_record_access (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        appointment_id INT NOT NULL UNIQUE,
+        patient_id INT NOT NULL,
+        doctor_id INT NOT NULL,
+        grant_access TINYINT(1) NOT NULL DEFAULT 1,
+        granted_at_cutoff TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        revoked TINYINT(1) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        CONSTRAINT fk_ara_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
+        CONSTRAINT fk_ara_patient FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE,
+        CONSTRAINT fk_ara_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE,
+        INDEX idx_ara_doctor_lookup (doctor_id, appointment_id, revoked)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // 9. prescriptions table (Doctor-Written Consultations)
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS prescriptions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        appointment_id INT NOT NULL UNIQUE,
+        doctor_id INT NOT NULL,
+        patient_id INT NOT NULL,
+        symptoms TEXT NOT NULL,
+        diagnosis TEXT NOT NULL,
+        medicines JSON NOT NULL,
+        advice TEXT DEFAULT NULL,
+        follow_up VARCHAR(100) DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        CONSTRAINT fk_rx_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
+        CONSTRAINT fk_rx_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE,
+        CONSTRAINT fk_rx_patient FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE,
+        INDEX idx_rx_patient (patient_id),
+        INDEX idx_rx_doctor (doctor_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
     // Ensure users table role ENUM includes 'admin'
     try {
       await connection.query(`ALTER TABLE users MODIFY COLUMN role ENUM('patient', 'doctor', 'admin') NOT NULL`);
