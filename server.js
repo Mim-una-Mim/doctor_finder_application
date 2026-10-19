@@ -5,9 +5,73 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const multer = require('multer');
 require('dotenv').config();
 
 const pool = require('./db');
+
+// Secure Medical Reports Storage Directory (OUTSIDE Express static root)
+const REPORTS_DIR = path.join(__dirname, '..', 'doctor-reports');
+try {
+  fs.mkdirSync(REPORTS_DIR, { recursive: true });
+} catch (e) {
+  console.error('Error creating reports directory:', e.message);
+}
+
+// Multer storage configuration using cryptographically random UUIDs
+const reportStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, REPORTS_DIR);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const safeExt = ['.pdf', '.jpg', '.jpeg', '.png'].includes(ext) ? ext : '.bin';
+    const safeName = `${crypto.randomUUID()}${safeExt}`;
+    cb(null, safeName);
+  }
+});
+
+const reportUpload = multer({
+  storage: reportStorage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only PDF, JPG, and PNG files are allowed.'));
+    }
+  }
+});
+
+// Helper: Inspect binary magic bytes to guarantee file signature matches allowed types
+function validateMagicBytes(filePath, mimetype) {
+  try {
+    const fd = fs.openSync(filePath, 'r');
+    const buffer = Buffer.alloc(8);
+    fs.readSync(fd, buffer, 0, 8, 0);
+    fs.closeSync(fd);
+
+    // PDF check: %PDF (25 50 44 46)
+    if (mimetype === 'application/pdf') {
+      return buffer.slice(0, 4).toString('ascii') === '%PDF';
+    }
+    // JPEG check: FF D8 FF
+    if (mimetype === 'image/jpeg') {
+      return buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF;
+    }
+    // PNG check: 89 50 4E 47 0D 0A 1A 0A
+    if (mimetype === 'image/png') {
+      return buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E &&
+             buffer[3] === 0x47 && buffer[4] === 0x0D && buffer[5] === 0x0A &&
+             buffer[6] === 0x1A && buffer[7] === 0x0A;
+    }
+    return false;
+  } catch (err) {
+    return false;
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -957,7 +1021,7 @@ app.get('/api/doctors/:id/slots', async (req, res) => {
 // -------------------------------------------------------------
 app.post('/api/appointments', requireAuth, async (req, res) => {
   try {
-    const { doctor_id, appointment_date, appointment_time, reason } = req.body;
+    const { doctor_id, appointment_date, appointment_time, reason, share_records } = req.body;
     const patient_id = req.user.id;
 
     // Validation
@@ -1018,18 +1082,31 @@ app.post('/api/appointments', requireAuth, async (req, res) => {
       [doctor_id, patient_id, formattedDate, formattedTime, reason || null]
     );
 
+    const newAppointmentId = insertResult.insertId;
+
+    // Patient-Controlled Doctor Access: If patient checked permission, create appointment access grant
+    const hasGrantedAccess = share_records === true || share_records === 'true' || share_records === 1;
+    if (hasGrantedAccess) {
+      await pool.query(
+        `INSERT INTO appointment_record_access (appointment_id, patient_id, doctor_id, grant_access, granted_at_cutoff, revoked)
+         VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP, 0)`,
+        [newAppointmentId, patient_id, doctor_id]
+      );
+    }
+
     return res.status(201).json({
       success: true,
       message: 'Appointment booked successfully! Status is pending doctor confirmation.',
       appointment: {
-        id: insertResult.insertId,
+        id: newAppointmentId,
         doctor_id,
         doctor_name: doctors[0].name,
         patient_id,
         appointment_date: formattedDate,
         appointment_time: formattedTime,
         reason: reason || null,
-        status: 'pending'
+        status: 'pending',
+        share_records: hasGrantedAccess
       }
     });
   } catch (error) {
@@ -1498,6 +1575,553 @@ app.get('/api/admin/appointments', requireAuth, requireAdmin, async (req, res) =
   } catch (error) {
     console.error('Admin appointments list error:', error);
     return res.status(500).json({ success: false, message: 'Server error fetching appointments.' });
+  }
+});
+
+// =============================================================
+// MEDICAL RECORDS & PATIENT-CONTROLLED ACCESS APIS
+// =============================================================
+
+// 1. POST /api/medical-records
+// Authenticated patient uploads a medical report or previous prescription
+app.post('/api/medical-records', requireAuth, (req, res) => {
+  if (req.user.role !== 'patient') {
+    return res.status(403).json({ success: false, message: 'Only patients can upload personal medical records.' });
+  }
+
+  reportUpload.single('file')(req, res, async (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({ success: false, message: 'File too large. Maximum size is 5 MB.' });
+      }
+      return res.status(400).json({ success: false, message: err.message || 'File upload error.' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded.' });
+    }
+
+    const { record_type, title, doctor_or_lab, record_date } = req.body;
+
+    if (!record_type || !['report', 'previous_prescription'].includes(record_type)) {
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      return res.status(400).json({ success: false, message: 'Valid record_type is required (report or previous_prescription).' });
+    }
+
+    if (!title || !title.trim()) {
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      return res.status(400).json({ success: false, message: 'Record title is required.' });
+    }
+
+    if (!record_date) {
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      return res.status(400).json({ success: false, message: 'Record date is required.' });
+    }
+
+    // Binary magic byte validation: do not trust client-supplied MIME or extension
+    const isSignatureValid = validateMagicBytes(req.file.path, req.file.mimetype);
+    if (!isSignatureValid) {
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      return res.status(400).json({ success: false, message: 'File contents do not match allowed formats (PDF, JPG, PNG).' });
+    }
+
+    try {
+      const patient_id = req.user.id;
+      const original_filename = path.basename(req.file.originalname).substring(0, 255);
+      const stored_filename = path.basename(req.file.filename);
+      const mime_type = req.file.mimetype;
+      const file_size_bytes = req.file.size;
+
+      const [result] = await pool.query(
+        `INSERT INTO medical_records 
+         (patient_id, record_type, title, doctor_or_lab, record_date, original_filename, stored_filename, mime_type, file_size_bytes)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [patient_id, record_type, title.trim(), doctor_or_lab ? doctor_or_lab.trim() : null, record_date, original_filename, stored_filename, mime_type, file_size_bytes]
+      );
+
+      return res.status(201).json({
+        success: true,
+        message: 'Medical record uploaded successfully.',
+        record: {
+          id: result.insertId,
+          patient_id,
+          record_type,
+          title: title.trim(),
+          doctor_or_lab: doctor_or_lab ? doctor_or_lab.trim() : null,
+          record_date,
+          original_filename,
+          mime_type,
+          file_size_bytes
+        }
+      });
+    } catch (dbErr) {
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      console.error('Error saving medical record to DB:', dbErr);
+      return res.status(500).json({ success: false, message: 'Server error saving record.' });
+    }
+  });
+});
+
+// 2. GET /api/medical-records
+// Authenticated patient views their own records, active appointment access permissions, and doctor-issued prescriptions
+app.get('/api/medical-records', requireAuth, async (req, res) => {
+  try {
+    if (req.user.role !== 'patient') {
+      return res.status(403).json({ success: false, message: 'Access denied.' });
+    }
+
+    const patient_id = req.user.id;
+
+    // A. Patient-uploaded records
+    const [uploadedRecords] = await pool.query(
+      `SELECT id, record_type, title, doctor_or_lab, record_date, original_filename, mime_type, file_size_bytes, created_at
+       FROM medical_records
+       WHERE patient_id = ?
+       ORDER BY record_date DESC, created_at DESC`,
+      [patient_id]
+    );
+
+    // B. Doctor-issued digital prescriptions from platform doctors
+    const [prescriptions] = await pool.query(
+      `SELECT rx.id, rx.appointment_id, rx.doctor_id, rx.symptoms, rx.diagnosis, rx.medicines, rx.advice, rx.follow_up, rx.created_at,
+              d.name as doctor_name, d.specialty as doctor_specialty,
+              a.appointment_date, a.appointment_time, a.status as appointment_status
+       FROM prescriptions rx
+       JOIN doctors d ON rx.doctor_id = d.id
+       JOIN appointments a ON rx.appointment_id = a.id
+       WHERE rx.patient_id = ?
+       ORDER BY rx.created_at DESC`,
+      [patient_id]
+    );
+
+    // C. Active Doctor Access Grants per appointment
+    const [shares] = await pool.query(
+      `SELECT ara.id as access_id, ara.appointment_id, ara.doctor_id, ara.grant_access, ara.granted_at_cutoff, ara.revoked, ara.created_at,
+              d.name as doctor_name, d.specialty as doctor_specialty,
+              a.appointment_date, a.appointment_time, a.status as appointment_status
+       FROM appointment_record_access ara
+       JOIN doctors d ON ara.doctor_id = d.id
+       JOIN appointments a ON ara.appointment_id = a.id
+       WHERE ara.patient_id = ?
+       ORDER BY a.appointment_date DESC`,
+      [patient_id]
+    );
+
+    return res.status(200).json({
+      success: true,
+      records: uploadedRecords,
+      prescriptions,
+      shares
+    });
+  } catch (error) {
+    console.error('Error fetching patient medical records:', error);
+    return res.status(500).json({ success: false, message: 'Server error fetching medical records.' });
+  }
+});
+
+// 3. GET /api/medical-records/:id/file
+// Secure streaming endpoint for medical files (patient owner OR doctor with active confirmed/completed snapshot permission)
+app.get('/api/medical-records/:id/file', requireAuth, async (req, res) => {
+  try {
+    const recordId = parseInt(req.params.id);
+    if (!recordId) return res.status(400).json({ success: false, message: 'Invalid record ID.' });
+
+    const [records] = await pool.query('SELECT * FROM medical_records WHERE id = ?', [recordId]);
+    if (records.length === 0) {
+      return res.status(404).json({ success: false, message: 'Medical record not found.' });
+    }
+    const record = records[0];
+
+    // Authorization evaluation
+    let isAuthorized = false;
+
+    // Case 1: The requesting user is the patient who owns the record
+    if (req.user.role === 'patient' && req.user.id === record.patient_id) {
+      isAuthorized = true;
+    }
+
+    // Case 2: The requesting user is a doctor requesting file via an appointment
+    if (!isAuthorized && req.user.role === 'doctor') {
+      const appointmentId = parseInt(req.query.appointment_id);
+      if (appointmentId) {
+        // Query verifying:
+        // - Doctor owns this appointment
+        // - Patient owns this appointment and the record
+        // - Status is confirmed or completed (pending, cancelled, and no-show are strictly blocked)
+        // - Access is granted and NOT revoked
+        // - SNAPSHOT PRIVACY: The record was created at or before granted_at_cutoff
+        const [accessCheck] = await pool.query(
+          `SELECT ara.id
+           FROM appointment_record_access ara
+           JOIN appointments a ON a.id = ara.appointment_id
+           JOIN doctors d ON d.id = a.doctor_id
+           WHERE ara.appointment_id = ?
+             AND ara.patient_id = ?
+             AND d.user_id = ?
+             AND ara.grant_access = 1
+             AND ara.revoked = 0
+             AND a.status IN ('confirmed', 'completed')
+             AND ? <= ara.granted_at_cutoff`,
+          [appointmentId, record.patient_id, req.user.id, record.created_at]
+        );
+
+        if (accessCheck.length > 0) {
+          isAuthorized = true;
+        }
+      }
+    }
+
+    if (!isAuthorized) {
+      return res.status(403).json({ success: false, message: 'Unauthorized. You do not have permission to access this medical record.' });
+    }
+
+    // Path traversal defense: resolve strictly inside REPORTS_DIR
+    const safeStoredFilename = path.basename(record.stored_filename);
+    const filePath = path.join(REPORTS_DIR, safeStoredFilename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ success: false, message: 'File not found on storage server.' });
+    }
+
+    const safeDownloadName = record.original_filename.replace(/[^a-zA-Z0-9._\- ]/g, '_');
+    res.setHeader('Content-Type', record.mime_type || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `inline; filename="${safeDownloadName}"`);
+    res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+
+    const readStream = fs.createReadStream(filePath);
+    readStream.pipe(res);
+  } catch (error) {
+    console.error('Error streaming medical record file:', error);
+    return res.status(500).json({ success: false, message: 'Server error retrieving file.' });
+  }
+});
+
+// 4. DELETE /api/medical-records/:id
+// Authenticated patient deletes their own uploaded medical record
+app.delete('/api/medical-records/:id', requireAuth, async (req, res) => {
+  try {
+    const recordId = parseInt(req.params.id);
+    if (!recordId) return res.status(400).json({ success: false, message: 'Invalid record ID.' });
+
+    const [records] = await pool.query('SELECT * FROM medical_records WHERE id = ?', [recordId]);
+    if (records.length === 0) {
+      return res.status(404).json({ success: false, message: 'Record not found.' });
+    }
+    const record = records[0];
+
+    // Only the patient who owns the record can delete it
+    if (req.user.role !== 'patient' || req.user.id !== record.patient_id) {
+      return res.status(403).json({ success: false, message: 'Unauthorized to delete this record.' });
+    }
+
+    await pool.query('DELETE FROM medical_records WHERE id = ?', [recordId]);
+
+    // Safely delete file from disk
+    const safeStoredFilename = path.basename(record.stored_filename);
+    const filePath = path.join(REPORTS_DIR, safeStoredFilename);
+    try {
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    } catch (fsErr) {
+      console.warn('Warning: DB record deleted but file unlinking failed:', fsErr.message);
+    }
+
+    return res.status(200).json({ success: true, message: 'Medical record deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting medical record:', error);
+    return res.status(500).json({ success: false, message: 'Server error deleting record.' });
+  }
+});
+
+// 5. PATCH /api/appointments/:id/revoke-access
+// Authenticated patient revokes doctor access for a specific appointment
+app.patch('/api/appointments/:id/revoke-access', requireAuth, async (req, res) => {
+  try {
+    const appointmentId = parseInt(req.params.id);
+    if (!appointmentId) return res.status(400).json({ success: false, message: 'Invalid appointment ID.' });
+
+    const [appointments] = await pool.query('SELECT patient_id FROM appointments WHERE id = ?', [appointmentId]);
+    if (appointments.length === 0) {
+      return res.status(404).json({ success: false, message: 'Appointment not found.' });
+    }
+
+    if (req.user.role !== 'patient' || req.user.id !== appointments[0].patient_id) {
+      return res.status(403).json({ success: false, message: 'Unauthorized. You do not own this appointment.' });
+    }
+
+    const [updateResult] = await pool.query(
+      'UPDATE appointment_record_access SET revoked = 1 WHERE appointment_id = ? AND patient_id = ?',
+      [appointmentId, req.user.id]
+    );
+
+    if (updateResult.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'No access permission record found for this appointment.' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Doctor access to previous medical records has been revoked.' });
+  } catch (error) {
+    console.error('Error revoking doctor access:', error);
+    return res.status(500).json({ success: false, message: 'Server error revoking access.' });
+  }
+});
+
+// 6. GET /api/doctor/appointments/:id/patient-records
+// Doctor views patient records shared with their confirmed or completed appointment (respecting snapshot cutoff)
+app.get('/api/doctor/appointments/:id/patient-records', requireAuth, async (req, res) => {
+  try {
+    if (req.user.role !== 'doctor') {
+      return res.status(403).json({ success: false, message: 'Access denied. Doctor account required.' });
+    }
+
+    const appointmentId = parseInt(req.params.id);
+    if (!appointmentId) return res.status(400).json({ success: false, message: 'Invalid appointment ID.' });
+
+    // Look up doctor profile
+    const [docs] = await pool.query('SELECT id, name FROM doctors WHERE user_id = ?', [req.user.id]);
+    if (docs.length === 0) {
+      return res.status(403).json({ success: false, message: 'Doctor profile not found.' });
+    }
+    const doctorId = docs[0].id;
+
+    // Check appointment existence and doctor ownership
+    const [appts] = await pool.query(
+      `SELECT a.id, a.doctor_id, a.patient_id, a.status,
+              u.first_name as patient_first_name, u.last_name as patient_last_name, u.phone as patient_phone
+       FROM appointments a
+       JOIN users u ON a.patient_id = u.id
+       WHERE a.id = ? AND a.doctor_id = ?`,
+      [appointmentId, doctorId]
+    );
+
+    if (appts.length === 0) {
+      return res.status(404).json({ success: false, message: 'Appointment not found or not assigned to you.' });
+    }
+    const appt = appts[0];
+
+    // Status rule: Only confirmed or completed appointments permit viewing.
+    // Pending, cancelled, and no-show appointments are strictly blocked.
+    if (!['confirmed', 'completed'].includes(appt.status)) {
+      return res.status(403).json({
+        success: false,
+        message: `Patient records cannot be viewed for ${appt.status} appointments.`
+      });
+    }
+
+    // Access check in appointment_record_access
+    const [accessGrants] = await pool.query(
+      `SELECT grant_access, granted_at_cutoff, revoked
+       FROM appointment_record_access
+       WHERE appointment_id = ? AND doctor_id = ?`,
+      [appointmentId, doctorId]
+    );
+
+    if (accessGrants.length === 0 || !accessGrants[0].grant_access) {
+      return res.status(403).json({
+        success: false,
+        message: 'Patient has not granted permission to view previous medical records for this appointment.'
+      });
+    }
+
+    if (accessGrants[0].revoked) {
+      return res.status(403).json({
+        success: false,
+        message: 'Patient has revoked access to previous medical records for this appointment.'
+      });
+    }
+
+    const cutoffTime = accessGrants[0].granted_at_cutoff;
+
+    // Snapshot privacy query: Only records created on or before granted_at_cutoff
+    const [sharedRecords] = await pool.query(
+      `SELECT id, record_type, title, doctor_or_lab, record_date, original_filename, mime_type, file_size_bytes, created_at
+       FROM medical_records
+       WHERE patient_id = ?
+         AND created_at <= ?
+       ORDER BY record_date DESC`,
+      [appt.patient_id, cutoffTime]
+    );
+
+    return res.status(200).json({
+      success: true,
+      appointment_id: appointmentId,
+      patient_name: `${appt.patient_first_name} ${appt.patient_last_name}`,
+      granted_at_cutoff: cutoffTime,
+      records: sharedRecords
+    });
+  } catch (error) {
+    console.error('Error fetching doctor shared patient records:', error);
+    return res.status(500).json({ success: false, message: 'Server error retrieving shared records.' });
+  }
+});
+
+// 7. POST /api/appointments/:id/prescription
+// Doctor writes or updates structured manual prescription for a confirmed appointment
+// Supports "Save Prescription" (keeps confirmed) and "Save Prescription & Mark Completed" (atomic transaction)
+app.post('/api/appointments/:id/prescription', requireAuth, async (req, res) => {
+  let connection;
+  try {
+    if (req.user.role !== 'doctor') {
+      return res.status(403).json({ success: false, message: 'Only doctors can write prescriptions.' });
+    }
+
+    const appointmentId = parseInt(req.params.id);
+    if (!appointmentId) return res.status(400).json({ success: false, message: 'Invalid appointment ID.' });
+
+    // Look up doctor profile
+    const [docs] = await pool.query('SELECT id, name FROM doctors WHERE user_id = ?', [req.user.id]);
+    if (docs.length === 0) {
+      return res.status(403).json({ success: false, message: 'Doctor profile not found.' });
+    }
+    const doctorId = docs[0].id;
+
+    const [appts] = await pool.query(
+      'SELECT id, doctor_id, patient_id, status FROM appointments WHERE id = ?',
+      [appointmentId]
+    );
+
+    if (appts.length === 0) {
+      return res.status(404).json({ success: false, message: 'Appointment not found.' });
+    }
+    const appt = appts[0];
+
+    // Must be the doctor who owns the appointment
+    if (appt.doctor_id !== doctorId) {
+      return res.status(403).json({ success: false, message: 'Unauthorized. You are not the doctor for this appointment.' });
+    }
+
+    // Prescriptions can ONLY be created/modified when status is 'confirmed'.
+    // Completed, cancelled, and no-show appointments are strictly rejected.
+    if (appt.status !== 'confirmed') {
+      return res.status(400).json({
+        success: false,
+        message: `Prescriptions can only be written for confirmed appointments (current status: ${appt.status}).`
+      });
+    }
+
+    const { symptoms, diagnosis, medicines, advice, follow_up, mark_completed } = req.body;
+
+    if (!symptoms || !symptoms.trim()) {
+      return res.status(400).json({ success: false, message: 'Symptoms / complaints are required.' });
+    }
+    if (!diagnosis || !diagnosis.trim()) {
+      return res.status(400).json({ success: false, message: 'Diagnosis is required.' });
+    }
+
+    // Validate medicines payload
+    let medicinesArr = [];
+    if (typeof medicines === 'string') {
+      try { medicinesArr = JSON.parse(medicines); } catch (e) { medicinesArr = []; }
+    } else if (Array.isArray(medicines)) {
+      medicinesArr = medicines;
+    }
+
+    if (!Array.isArray(medicinesArr) || medicinesArr.length === 0) {
+      return res.status(400).json({ success: false, message: 'At least one medicine with dosage and frequency is required.' });
+    }
+
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    // Check if prescription already exists for this appointment (upsert)
+    const [existingRx] = await connection.query('SELECT id FROM prescriptions WHERE appointment_id = ?', [appointmentId]);
+
+    const medicinesJson = JSON.stringify(medicinesArr);
+
+    if (existingRx.length === 0) {
+      await connection.query(
+        `INSERT INTO prescriptions (appointment_id, doctor_id, patient_id, symptoms, diagnosis, medicines, advice, follow_up)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [appointmentId, doctorId, appt.patient_id, symptoms.trim(), diagnosis.trim(), medicinesJson, advice ? advice.trim() : null, follow_up ? follow_up.trim() : null]
+      );
+    } else {
+      await connection.query(
+        `UPDATE prescriptions 
+         SET symptoms = ?, diagnosis = ?, medicines = ?, advice = ?, follow_up = ?
+         WHERE appointment_id = ?`,
+        [symptoms.trim(), diagnosis.trim(), medicinesJson, advice ? advice.trim() : null, follow_up ? follow_up.trim() : null, appointmentId]
+      );
+    }
+
+    // If explicit "Save Prescription & Mark Completed" action was selected
+    let updatedStatus = appt.status;
+    if (mark_completed === true || mark_completed === 'true') {
+      await connection.query('UPDATE appointments SET status = \'completed\' WHERE id = ?', [appointmentId]);
+      updatedStatus = 'completed';
+    }
+
+    await connection.commit();
+
+    return res.status(200).json({
+      success: true,
+      message: updatedStatus === 'completed' 
+        ? 'Prescription saved and appointment marked as completed.' 
+        : 'Prescription saved successfully.',
+      appointment_id: appointmentId,
+      status: updatedStatus
+    });
+  } catch (error) {
+    if (connection) await connection.rollback();
+    console.error('Error saving doctor prescription:', error);
+    return res.status(500).json({ success: false, message: 'Server error saving prescription.' });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+// 8. GET /api/appointments/:id/prescription
+// View structured prescription (owning doctor or owning patient)
+app.get('/api/appointments/:id/prescription', requireAuth, async (req, res) => {
+  try {
+    const appointmentId = parseInt(req.params.id);
+    if (!appointmentId) return res.status(400).json({ success: false, message: 'Invalid appointment ID.' });
+
+    const [prescriptions] = await pool.query(
+      `SELECT rx.*, 
+              d.name as doctor_name, d.specialty as doctor_specialty, d.degree as doctor_degree,
+              u.first_name as patient_first_name, u.last_name as patient_last_name, u.phone as patient_phone,
+              a.appointment_date, a.appointment_time, a.status as appointment_status
+       FROM prescriptions rx
+       JOIN doctors d ON rx.doctor_id = d.id
+       JOIN users u ON rx.patient_id = u.id
+       JOIN appointments a ON rx.appointment_id = a.id
+       WHERE rx.appointment_id = ?`,
+      [appointmentId]
+    );
+
+    if (prescriptions.length === 0) {
+      return res.status(404).json({ success: false, message: 'No prescription found for this appointment.' });
+    }
+    const rx = prescriptions[0];
+
+    // Authorization: User must be either the owning patient OR the owning doctor
+    let isAuthorized = false;
+    if (req.user.role === 'patient' && req.user.id === rx.patient_id) {
+      isAuthorized = true;
+    }
+    if (!isAuthorized && req.user.role === 'doctor') {
+      const [docs] = await pool.query('SELECT id FROM doctors WHERE user_id = ?', [req.user.id]);
+      if (docs.length > 0 && docs[0].id === rx.doctor_id) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
+      return res.status(403).json({ success: false, message: 'Unauthorized. You do not have access to this prescription.' });
+    }
+
+    // Safely parse medicines JSON
+    if (typeof rx.medicines === 'string') {
+      try { rx.medicines = JSON.parse(rx.medicines); } catch (e) { rx.medicines = []; }
+    }
+
+    return res.status(200).json({
+      success: true,
+      prescription: rx
+    });
+  } catch (error) {
+    console.error('Error fetching appointment prescription:', error);
+    return res.status(500).json({ success: false, message: 'Server error retrieving prescription.' });
   }
 });
 

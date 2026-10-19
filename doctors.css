@@ -502,6 +502,17 @@
   transition: border-color 0.2s;
 }
 
+/* Restore native checkbox appearance — must come after the rule above */
+.form-group input[type="checkbox"] {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--steel);
+}
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {

@@ -300,6 +300,13 @@
           <textarea id="patientReason" placeholder="Briefly describe your symptoms..."></textarea>
         </div>
 
+        <div class="form-group" style="display:flex;align-items:flex-start;gap:8px;background:var(--alice);padding:10px 12px;border-radius:8px;border:1px solid var(--light-gray);margin-top:6px;">
+          <input type="checkbox" id="shareRecordsCheckbox" style="margin-top:3px;cursor:pointer;" />
+          <label for="shareRecordsCheckbox" style="font-size:12px;color:var(--charcoal);cursor:pointer;margin:0;line-height:1.4;">
+            <i class="fa-solid fa-lock" style="color:#502D55;"></i> Allow this doctor to view my previous medical reports and prescriptions (patient-controlled permission)
+          </label>
+        </div>
+
         <button class="confirm-btn" onclick="confirmBooking('normal')">Confirm Appointment</button>
       </div>
 
@@ -360,13 +367,90 @@
 
   <!-- APPOINTMENTS MANAGEMENT MODAL -->
   <div class="modal-overlay" id="appointmentsModal">
-    <div class="modal" style="max-width: 680px;">
+    <div class="modal" style="max-width: 680px; max-height: 90vh; overflow-y: auto;">
       <button class="modal-close" onclick="closeAppointments()"><i class="fa-solid fa-xmark"></i></button>
       <h2 style="font-size: 20px; font-weight: 700; color: var(--charcoal); margin-bottom: 4px; display: flex; align-items: center; gap: 10px;">
-        <i class="fa-regular fa-calendar-check" style="color: var(--steel);"></i> My Appointments
+        <i class="fa-regular fa-calendar-check" style="color: var(--steel);"></i> My Appointments & Medical Vault
       </h2>
       <p style="font-size: 13px; color: var(--gray); margin-bottom: 20px;" id="appointmentsSubtitle">View and manage your scheduled appointments.</p>
       <div id="appointmentsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+    </div>
+  </div>
+
+  <!-- DOCTOR PRESCRIPTION WRITER MODAL -->
+  <div class="modal-overlay" id="prescriptionWriterModal">
+    <div class="modal" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+      <button class="modal-close" onclick="closePrescriptionWriter()"><i class="fa-solid fa-xmark"></i></button>
+      <h2 style="font-size: 20px; font-weight: 700; color: #502D55; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-file-prescription"></i> Write Prescription
+      </h2>
+      <p style="font-size: 13px; color: var(--gray); margin-bottom: 16px;" id="rxWriterSubtitle">Manual clinical prescription entry (No AI generation).</p>
+      
+      <input type="hidden" id="rxAppointmentId" value="" />
+
+      <div class="form-group">
+        <label>Patient Information</label>
+        <div id="rxPatientInfo" style="font-size: 13px; color: var(--charcoal); background: var(--alice); padding: 8px 12px; border-radius: 6px; font-weight: 600;"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Symptoms / Chief Complaints <span style="color:#c0392b;">*</span></label>
+        <textarea id="rxSymptoms" placeholder="e.g. Fever, persistent cough for 4 days, mild headache..." style="height: 65px;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Clinical Diagnosis <span style="color:#c0392b;">*</span></label>
+        <input type="text" id="rxDiagnosis" placeholder="e.g. Acute Viral Upper Respiratory Infection" />
+      </div>
+
+      <div class="form-group">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+          <label style="margin:0;">Medicines List <span style="color:#c0392b;">*</span></label>
+          <button type="button" class="btn-outline" style="font-size: 11px; padding: 3px 8px; cursor: pointer;" onclick="addMedicineRow()">
+            <i class="fa-solid fa-plus"></i> Add Medicine
+          </button>
+        </div>
+        <div id="medicinesContainer" style="display:flex; flex-direction:column; gap: 8px;"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Advice / Special Instructions <span>(optional)</span></label>
+        <textarea id="rxAdvice" placeholder="e.g. Drink warm fluids, avoid cold water, get adequate bed rest..." style="height: 60px;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Follow-up Duration <span>(optional)</span></label>
+        <input type="text" id="rxFollowUp" placeholder="e.g. After 5 days or if symptoms worsen" />
+      </div>
+
+      <div style="display:flex; gap: 10px; margin-top: 18px; flex-wrap: wrap;">
+        <button class="confirm-btn" style="flex:1; background: #502D55; margin:0;" onclick="submitDoctorPrescription(false)">
+          <i class="fa-solid fa-floppy-disk"></i> Save Prescription
+        </button>
+        <button class="confirm-btn" style="flex:1; background: #27ae60; margin:0;" onclick="submitDoctorPrescription(true)">
+          <i class="fa-solid fa-circle-check"></i> Save & Mark Completed
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRESCRIPTION VIEWER MODAL (Patient & Doctor) -->
+  <div class="modal-overlay" id="prescriptionViewModal">
+    <div class="modal" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+      <button class="modal-close" onclick="closePrescriptionView()"><i class="fa-solid fa-xmark"></i></button>
+      <div id="prescriptionContent"></div>
+    </div>
+  </div>
+
+  <!-- DOCTOR VIEW SHARED PATIENT RECORDS MODAL -->
+  <div class="modal-overlay" id="sharedRecordsModal">
+    <div class="modal" style="max-width: 640px; max-height: 90vh; overflow-y: auto;">
+      <button class="modal-close" onclick="closeSharedRecords()"><i class="fa-solid fa-xmark"></i></button>
+      <h2 style="font-size: 18px; font-weight: 700; color: #502D55; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-folder-open"></i> Patient Shared Medical Records
+      </h2>
+      <p style="font-size: 12px; color: var(--gray); margin-bottom: 14px;" id="sharedRecordsSubtitle"></p>
+      <div id="sharedRecordsList" style="display:flex; flex-direction:column; gap:10px;"></div>
     </div>
   </div>
 
