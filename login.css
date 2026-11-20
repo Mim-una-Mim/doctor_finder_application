@@ -525,3 +525,22 @@
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
 
 .auth-layout{flex-direction:row-reverse}.auth-medical-art{display:flex;align-items:center;justify-content:center;gap:clamp(16px,4vw,34px);min-height:150px;margin:22px 0;color:var(--violet)}.auth-medical-art i{display:grid;place-items:center;width:76px;height:76px;border-radius:22px;background:var(--peach);color:var(--violet);font-size:32px;box-shadow:0 8px 22px rgba(80,45,85,.12)}.auth-medical-art i:first-child{width:100px;height:100px;background:var(--violet);color:var(--cream);font-size:44px}@media(max-width:800px){.auth-layout{flex-direction:column-reverse}.auth-medical-art{min-height:90px;margin:12px 0}}
+/* Hide the right-side welcome text panel on login and register pages */
+.auth-left {
+  display: none;
+}
+
+/* Let the form area use the space left by the hidden panel */
+.auth-right {
+  flex: 1 1 100%;
+  width: 100%;
+}
+
+/* Give the forms more room while keeping them centered */
+.auth-card {
+  max-width: 680px;
+}
+
+.register-card {
+  max-width: 760px;
+}
