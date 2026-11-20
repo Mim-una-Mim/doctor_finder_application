@@ -1230,9 +1230,13 @@ app.get('/api/patient/appointments', requireAuth, async (req, res) => {
         d.specialty as doctor_specialty,
         (SELECT location FROM chambers WHERE doctor_id = d.id LIMIT 1) as chamber_location,
         (SELECT address FROM chambers WHERE doctor_id = d.id LIMIT 1) as chamber_address,
-        (SELECT fees FROM chambers WHERE doctor_id = d.id LIMIT 1) as consultation_fee
+        (SELECT fees FROM chambers WHERE doctor_id = d.id LIMIT 1) as consultation_fee,
+        ara.grant_access as records_grant_access,
+        ara.revoked as records_revoked,
+        ara.granted_at_cutoff as records_granted_at_cutoff
        FROM appointments a
        JOIN doctors d ON a.doctor_id = d.id
+       LEFT JOIN appointment_record_access ara ON ara.appointment_id = a.id
        WHERE a.patient_id = ?
        ORDER BY a.appointment_date DESC, a.appointment_time DESC`,
       [patient_id]
@@ -1863,6 +1867,70 @@ app.patch('/api/appointments/:id/revoke-access', requireAuth, async (req, res) =
   } catch (error) {
     console.error('Error revoking doctor access:', error);
     return res.status(500).json({ success: false, message: 'Server error revoking access.' });
+  }
+});
+
+// 5b. POST /api/appointments/:id/grant-access
+// Authenticated patient grants or re-grants doctor access to previous medical records for an existing appointment
+app.post('/api/appointments/:id/grant-access', requireAuth, async (req, res) => {
+  try {
+    const appointmentId = parseInt(req.params.id);
+    if (!appointmentId) return res.status(400).json({ success: false, message: 'Invalid appointment ID.' });
+
+    if (req.user.role !== 'patient') {
+      return res.status(403).json({ success: false, message: 'Unauthorized. Only patients can grant medical record access.' });
+    }
+
+    // Look up appointment to verify ownership, doctor assignment, and status eligibility
+    const [appointments] = await pool.query(
+      `SELECT a.id, a.doctor_id, a.patient_id, a.status, d.name as doctor_name
+       FROM appointments a
+       JOIN doctors d ON a.doctor_id = d.id
+       WHERE a.id = ?`,
+      [appointmentId]
+    );
+
+    if (appointments.length === 0) {
+      return res.status(404).json({ success: false, message: 'Appointment not found.' });
+    }
+
+    const appt = appointments[0];
+
+    // Ownership verification
+    if (appt.patient_id !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Unauthorized. You do not own this appointment.' });
+    }
+
+    // Status eligibility: Rejected/cancelled or no-show appointments are ineligible for granting access
+    if (['cancelled', 'no-show'].includes(appt.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot grant medical record access for an appointment marked as ${appt.status}.`
+      });
+    }
+
+    const doctorId = appt.doctor_id;
+
+    // Insert or update existing permission row (re-grant resets cutoff timestamp and unrevokes)
+    await pool.query(
+      `INSERT INTO appointment_record_access (appointment_id, patient_id, doctor_id, grant_access, granted_at_cutoff, revoked)
+       VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP, 0)
+       ON DUPLICATE KEY UPDATE
+         grant_access = 1,
+         revoked = 0,
+         granted_at_cutoff = CURRENT_TIMESTAMP`,
+      [appointmentId, req.user.id, doctorId]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `Access granted to Dr. ${appt.doctor_name || 'doctor'} for your previous medical records.`,
+      appointment_id: appointmentId,
+      doctor_id: doctorId
+    });
+  } catch (error) {
+    console.error('Error granting doctor access:', error);
+    return res.status(500).json({ success: false, message: 'Server error granting access.' });
   }
 });
 

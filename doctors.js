@@ -728,10 +728,33 @@ async function openAppointmentsModal() {
           `;
         }
 
-        if (viewRxBtn || cancelBtn) {
+        // Patient Medical Records Permission action button:
+        // Eligible if appointment is not cancelled and not no-show
+        let recordAccessBtn = '';
+        const isEligibleForAccess = !['cancelled', 'no-show'].includes(a.status);
+        if (isEligibleForAccess) {
+          const hasActiveAccess = a.records_grant_access === 1 && a.records_revoked === 0;
+          if (hasActiveAccess) {
+            recordAccessBtn = `
+              <button class="btn-outline" style="cursor:pointer;padding:5px 12px;font-size:12px;color:#c0392b;border-color:#c0392b;background:#fff;" onclick="revokeDoctorAccess(${a.id})">
+                <i class="fa-solid fa-ban"></i> Revoke Access
+              </button>
+            `;
+          } else {
+            const btnLabel = a.records_grant_access === 1 && a.records_revoked === 1 ? 'Re-grant Access' : 'Grant Access';
+            recordAccessBtn = `
+              <button class="btn-outline" style="cursor:pointer;padding:5px 12px;font-size:12px;color:#27ae60;border-color:#27ae60;background:#fff;" onclick="grantDoctorAccess(${a.id}, '${escapeHtml(a.doctor_name || 'the doctor')}')">
+                <i class="fa-solid fa-shield-halved"></i> ${btnLabel}
+              </button>
+            `;
+          }
+        }
+
+        if (viewRxBtn || cancelBtn || recordAccessBtn) {
           actionsHtml = `
-            <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
+            <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap;">
               ${viewRxBtn}
+              ${recordAccessBtn}
               ${cancelBtn}
             </div>
           `;
@@ -750,6 +773,14 @@ async function openAppointmentsModal() {
         ? `<div style="font-size:12px;color:var(--gray);margin-top:2px;"><i class="fa-solid fa-location-dot" style="color:#c0392b;"></i> <em>Location:</em> ${escapeHtml(a.emergency_location)}</div>`
         : '';
 
+      const recordsStatusHtml = (!isDoctor && !['cancelled', 'no-show'].includes(a.status))
+        ? (a.records_grant_access === 1 && a.records_revoked === 0
+            ? `<div style="font-size:12px;color:#27ae60;margin-top:2px;"><i class="fa-solid fa-lock-open"></i> <em>Medical Records:</em> Access Granted to Doctor (Active)</div>`
+            : (a.records_grant_access === 1 && a.records_revoked === 1
+                ? `<div style="font-size:12px;color:#c0392b;margin-top:2px;"><i class="fa-solid fa-lock"></i> <em>Medical Records:</em> Access Revoked</div>`
+                : `<div style="font-size:12px;color:var(--gray);margin-top:2px;"><i class="fa-solid fa-lock"></i> <em>Medical Records:</em> Access Not Granted</div>`))
+        : '';
+
       return `
         <div style="background:var(--alice);border:1px solid ${a.is_emergency ? '#935073' : 'var(--light-gray)'};border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:4px;">
           <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -766,6 +797,7 @@ async function openAppointmentsModal() {
             <span><i class="fa-regular fa-clock"></i> ${a.appointment_time}</span>
           </div>
           ${locationHtml}
+          ${recordsStatusHtml}
           ${a.reason ? `<div style="font-size:12px;color:var(--gray);margin-top:2px;"><em>Reason:</em> ${escapeHtml(a.reason)}</div>` : ''}
           ${actionsHtml}
         </div>
@@ -1136,6 +1168,46 @@ async function deleteMedicalRecord(id) {
     }
   } catch (err) {
     showToast('Network error while deleting.', 'error');
+  }
+}
+
+async function grantDoctorAccess(appointmentId, doctorName) {
+  const confirmed = confirm(
+    `Allow ${doctorName} to view your previous medical reports and prescriptions for this appointment?\n\n` +
+    `Note: Only documents uploaded before now will be accessible. Any documents you upload in the future will remain private unless shared again.`
+  );
+  if (!confirmed) return;
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    showToast('Please log in to manage permissions.', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/grant-access`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      data = { success: false, message: `Server error (${res.status} ${res.statusText})` };
+    }
+
+    if (res.ok && data.success) {
+      showToast(data.message || 'Access granted successfully.', 'success');
+      openAppointmentsModal(); // Refresh modal appointments and vault
+    } else {
+      showToast(data.message || `Failed to grant access (${res.status}).`, 'error');
+    }
+  } catch (err) {
+    showToast(`Network error: ${err.message || 'Server unreachable.'}`, 'error');
   }
 }
 
