@@ -2,9 +2,11 @@
   "name": "doctor-finder",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "electron-main.js",
   "scripts": {
     "start": "node server.js",
+    "start:desktop": "electron .",
+    "dist:win": "electron-builder --win nsis",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,5 +22,19 @@
     "multer": "^2.4.0",
     "mysql2": "^3.24.5",
     "nodemailer": "^10.0.16"
+  },
+  "devDependencies": {
+    "electron": "^45.4.1",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "com.doctorfinder.app",
+    "productName": "DoctorFinder",
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis"
+    }
   }
 }
