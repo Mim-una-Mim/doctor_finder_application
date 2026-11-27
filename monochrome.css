@@ -1,0 +1,266 @@
+/* DoctorFinder monochrome theme: Ivory Breeze #F9F8F2 + Charcoal Chic #272727 */
+:root {
+  --paper: #F9F8F2;
+  --white: #FFFFFF;
+  --ink: #272727;
+  --muted: #55534E;
+  --violet: #272727;
+  --rose: #272727;
+  --peach: #FFFFFF;
+  --cream: #F9F8F2;
+  --navy: #272727;
+  --steel: #272727;
+  --slate: #55534E;
+  --alice: #F9F8F2;
+  --sky: #FFFFFF;
+  --charcoal: #272727;
+  --gray: #55534E;
+  --light-gray: #272727;
+  --green: #272727;
+  --red: #272727;
+  --amber: #272727;
+  --sidebar-width: clamp(250px, 18vw, 275px);
+}
+
+html { background: var(--paper); scroll-behavior: smooth; }
+body, body.auth-body, body.admin-body {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+/* Shared navigation used by the existing multi-page app */
+.navbar, .sidebar-nav, .nav-header, .nav-menu, .sidebar, .brand {
+  background: var(--white) !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+}
+.navbar, .sidebar-nav { border-right: 1px solid var(--ink) !important; }
+.nav-header, .nav-menu, .brand, .sidebar .nav, .sidebar .account-actions {
+  border-color: var(--ink) !important;
+}
+.nav-logo, .nav-links a, .nav-actions a, .nav-toggle, .brand, .nav button {
+  color: var(--ink) !important;
+}
+.nav-logo strong, .nav-logo span { color: #000 !important; }
+.nav-links a, .nav-actions a, .btn-primary, .btn-outline, .about-cta-btn, .nav-toggle,
+.nav a, .nav button, .account-actions a, .account-actions button, button,
+input, select, textarea, .doctor-card, .doctor-card-lg, .auth-card,
+.register-card, .login-card, .contact-card, .filter-panel, .stat-card,
+.feature-card, .step-card, .about-visual, .hero-visual, .search-bar,
+.search-box, .form-control, .form-group input, .form-group select,
+.form-group textarea, .admin-card, .dashboard-card, .modal-content {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.nav-links a, .nav-actions a, .btn-primary, .btn-outline, .about-cta-btn, .nav-toggle,
+.nav a, .nav button, .account-actions a, .account-actions button, button,
+.hero-actions a, .hero-actions button, .search-btn, .book-btn,
+.book-btn-lg, .view-btn, .submit-btn, .auth-submit, .filter-btn {
+  border: 1px solid var(--ink) !important;
+  background: var(--white) !important;
+  color: var(--ink) !important;
+  transition: background-color .15s ease, color .15s ease !important;
+}
+.nav-links a:hover, .nav-actions a:hover, .btn-primary:hover, .btn-outline:hover, .about-cta-btn:hover,
+.nav a:hover, .nav button:hover, .account-actions a:hover, .account-actions button:hover,
+button:hover, .hero-actions a:hover, .hero-actions button:hover,
+.search-btn:hover, .book-btn:hover, .book-btn-lg:hover, .view-btn:hover,
+.submit-btn:hover, .auth-submit:hover, .filter-btn:hover, button:active,
+.nav-links a.active, .nav a.selected, .nav a[aria-current="page"],
+.account-actions a.selected, .account-actions a[aria-current="page"],
+.nav button.selected, button.selected,
+button.is-selected, a.is-selected, button[aria-pressed="true"] {
+  background: var(--ink) !important;
+  color: var(--white) !important;
+}
+
+a { color: var(--ink) !important; text-decoration-color: var(--ink) !important; }
+a:hover { color: var(--muted) !important; }
+h1, h2, h3, h4, p, label, span, li, small, strong, .eyebrow,
+.section-title, .page-title, .form-section-title { color: inherit; }
+
+/* Replace colored panels, gradients and shadows with paper and thin rules */
+*, *::before, *::after { box-shadow: none !important; }
+.hero, .hero-section, .hero-banner, .page-hero, .stats-section,
+.how-it-works, .features-section, .doctors-section, .content-section,
+.about-section, .cta-section, .auth-layout, .auth-right, .register-right,
+.login-right, .admin-main, .admin-content, .main-content, .footer,
+.site-footer, .sidebar-footer, .sidebar-section, .search-section {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+.hero, .hero-section, .hero-banner, .page-hero, .stats-section,
+.how-it-works, .features-section, .doctors-section, .content-section,
+.about-section, .cta-section, .footer, .site-footer, .search-section {
+  border-color: var(--ink) !important;
+}
+.card, .doctor-card, .doctor-card-lg, .feature-card, .step-card,
+.stat-card, .auth-card, .register-card, .login-card, .admin-card,
+.dashboard-card, .filter-panel, .contact-card, .modal-content {
+  background: var(--white) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--ink) !important;
+}
+.tag, .badge, .availability-badge, .fees-badge, .rating-tag,
+.form-section-title, .tab-button, .role-tab, .role-selector button {
+  background: var(--white) !important;
+  color: var(--ink) !important;
+  border-color: var(--ink) !important;
+}
+.tab-button.active, .role-tab.active, .role-selector button.active,
+.day-chip:has(input:checked), .filter-option.active {
+  background: var(--ink) !important;
+  color: var(--white) !important;
+}
+input, select, textarea, .form-control, .form-group input,
+.form-group select, .form-group textarea {
+  background: var(--white) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--ink) !important;
+}
+input::placeholder, textarea::placeholder { color: #68665F !important; opacity: 1; }
+input:focus, select:focus, textarea:focus, button:focus-visible,
+a:focus-visible { outline: 2px solid var(--ink) !important; outline-offset: 2px; }
+.divider, hr, .section-divider, .form-section-title { border-color: var(--ink) !important; }
+.hero-art, .medical-art, .hero-illustration, .icon-box, .doctor-avatar,
+.doc-avatar-lg, .avatar, .social-link, .stat-icon {
+  background: var(--white) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--ink) !important;
+}
+.toast, .alert, .error-message, .success-message {
+  background: var(--white) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--ink) !important;
+}
+
+/* Home prototype layout */
+.app-shell { background: var(--white) !important; border-color: var(--ink) !important; }
+.sidebar { border-color: var(--ink) !important; }
+.app-shell {
+  display: grid !important;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr) !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+.app-shell > .sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  min-height: 100vh;
+  border-right: 1px solid var(--ink) !important;
+}
+.sidebar > .account-actions {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  flex: 0 0 auto;
+  margin-top: auto !important;
+  padding: 16px 12px !important;
+  border-top: 1px solid var(--ink) !important;
+}
+.brand { min-height: 108px; }
+.brand-mark { display: grid; flex: 0 0 30px; place-items: center; }
+.nav a { gap: 16px; min-height: 56px; padding: 14px 16px; }
+.nav a i, .account-actions a i { width: 22px; flex: 0 0 22px; text-align: center; font-size: 18px; }
+.nav a span, .account-actions a span { color: inherit; }
+.nav a, .nav button, .account-actions a, .account-actions button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  border: 1px solid var(--ink) !important;
+  background: var(--white) !important;
+  color: var(--ink) !important;
+  text-decoration: none;
+  font-weight: 600;
+}
+.account-actions a { min-height: 52px; justify-content: center; padding: 12px 14px; font-weight: 600; }
+.main-content { min-width: 0; width: 100%; }
+.search-bar {
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 220px) auto !important;
+  padding: 16px 20px !important;
+  border-bottom: 1px solid var(--ink) !important;
+}
+.hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: center !important;
+  min-height: 340px !important;
+  padding: clamp(36px, 5vw, 76px) clamp(24px, 4vw, 56px) !important;
+  border-bottom: 1px solid var(--ink) !important;
+}
+.hero-copy { max-width: 850px; }
+.hero h1 { max-width: 720px; font-size: clamp(38px, 4.5vw, 64px) !important; line-height: 1.08 !important; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.hero-actions a { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; text-decoration: none; font-weight: 700; }
+.medical-art {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  padding: 14px !important;
+  min-height: 250px;
+}
+.medical-art .art-square { display: grid; min-height: 82px; place-items: center; border: 1px solid var(--ink); background: var(--white); font-size: 30px; }
+.medical-art .art-caption { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; padding: 8px 10px; border: 1px solid var(--ink); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.doctors-section { padding: 28px 24px !important; border-bottom: 1px solid var(--ink); }
+.section-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
+.section-heading a { display: inline-flex; align-items: center; min-height: 40px; padding: 8px 12px; border: 1px solid var(--ink); text-decoration: none; font-weight: 600; }
+.doctor-list { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 12px !important; }
+.doctor { min-width: 0; border: 1px solid var(--ink) !important; padding: 14px !important; }
+.footer { display: flex; justify-content: space-between; gap: 16px; padding: 16px 24px !important; }
+.footer, .footer * {
+  color: #000 !important;
+}
+.footer a { text-decoration-color: #000 !important; }
+.home-contact {
+  padding: 30px 24px;
+  border-bottom: 1px solid var(--ink);
+  background: var(--white) !important;
+  color: #000 !important;
+}
+.home-contact h2 { margin: 4px 0 18px; color: #000 !important; font-size: clamp(24px, 3vw, 34px); }
+.home-contact .eyebrow { margin: 0; color: #000 !important; }
+.home-contact-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.home-contact-item {
+  display: flex;
+  min-height: 88px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000 !important;
+  text-decoration: none;
+}
+.home-contact-item:hover { background: #272727 !important; color: #fff !important; }
+.home-contact-item strong, .home-contact-item .contact-label { color: inherit !important; }
+.home-contact-item .contact-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+
+@media (max-width: 760px) {
+  .app-shell { display: block !important; }
+  .app-shell > .sidebar { position: relative; height: auto; min-height: 0; border-right: 0 !important; border-bottom: 1px solid var(--ink) !important; }
+  .nav, .account-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero { grid-template-columns: 1fr !important; min-height: 0 !important; }
+  .medical-art { max-width: 360px; width: 100%; }
+  .doctor-list { grid-template-columns: 1fr !important; }
+  .home-contact-grid { grid-template-columns: 1fr; }
+  .search-bar { grid-template-columns: 1fr !important; }
+  .footer { flex-direction: column; }
+  .form-row-2, .doctor-grid, .doctor-list, .feature-grid, .steps-grid {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+

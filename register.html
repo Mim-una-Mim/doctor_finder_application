@@ -4,33 +4,40 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Register — DoctorFinder</title>
+  <link rel="stylesheet" href="legacy-shared.css" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="login.css" />
   <link rel="stylesheet" href="register.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="monochrome.css" />
 </head>
-<body class="auth-body sidebar-page">
+<body class="auth-body">
+<div class="app-shell">
+<aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><i class="fa-solid fa-stethoscope"></i></span>
+        <span>DoctorFinder</span>
+      </div>
+
+      <nav class="nav" aria-label="Main navigation">
+        <a class="selectable" href="index.html"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span></a>
+        <a class="selectable" href="doctors.html"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctors</span></a>
+        <a class="selectable" href="about.html"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>About</span></a>
+        <a class="selectable" href="index.html#contact"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>Contact</span></a>
+      </nav>
+
+      <div class="account-actions nav-actions">
+        <a class="selectable" href="login.html"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i><span>Log In</span></a>
+        <a class="selectable selected" href="register.html" aria-current="page"><i class="fa-solid fa-user-plus" aria-hidden="true"></i><span>Register</span></a>
+        <a class="selectable" href="doctors.html"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i><span>Book Appointment</span></a>
+      </div>
+    </aside>
+<main class="main-content">
+
 
   <!-- NAVBAR -->
-  <nav class="navbar sidebar-nav" aria-label="Main navigation">
-    <div class="nav-header">
-      <a href="index.html" class="nav-logo"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctor<strong>Finder</strong></span></a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open navigation menu"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
-    </div>
-    <div class="nav-menu" id="primaryNav">
-      <ul class="nav-links">
-        <li><a href="index.html" ><i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span></a></li>
-        <li><a href="doctors.html" ><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctors</span></a></li>
-        <li><a href="about.html" ><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>About</span></a></li>
-        <li><a href="index.html#contact"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>Contact</span></a></li>
-      </ul>
-      <div class="nav-actions">
-        <a href="login.html" class="btn-outline"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Log In</a><a href="register.html" class="btn-outline register-nav-btn"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Register</a>
-        <a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Book Appointment</a>
-      </div>
-    </div>
-  </nav>
+  
 
   <!-- LAYOUT -->
   <div class="auth-layout">
@@ -277,7 +284,12 @@
     <span id="toastMsg">Account created successfully!</span>
   </div>
 
+</main>
+</div>
+
   <script src="script.js"></script>
   <script src="register.js"></script>
 </body>
 </html>
+
+

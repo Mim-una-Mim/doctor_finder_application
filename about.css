@@ -7,22 +7,24 @@
 }
 
 .about-hero .hero-eyebrow {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
   color: var(--steel);
   background-color: var(--white);
   display: inline-block;
   padding: 6px 14px;
   border-radius: 20px;
-  margin-bottom: 18px;
+  margin: 0 auto 18px;
   border: 1px solid var(--sky);
 }
 
-.about-hero h1 {
-  font-size: 38px;
+.about-hero .about-hero-title {
+  font-size: 32px;
   font-weight: 800;
   color: var(--charcoal);
-  margin-bottom: 14px;
+  max-width: 820px;
+  margin: 0 auto 14px;
   line-height: 1.2;
 }
 

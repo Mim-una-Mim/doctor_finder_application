@@ -1,94 +1,75 @@
-// Hero search — forwards query to doctors.html
+// Route the home-page search to the existing doctor search page.
 function executeHeroSearch() {
-  const heroSearchInput = document.getElementById('heroSearch');
-  const term = heroSearchInput ? heroSearchInput.value.trim() : '';
-  const heroLocSelect = document.getElementById('heroLocation');
-  const loc = heroLocSelect ? heroLocSelect.value.trim() : '';
+  const input = document.getElementById('heroSearch');
+  const locationSelect = document.getElementById('heroLocation');
   const params = new URLSearchParams();
-  if (term) params.append('search', term);
-  if (loc && loc.toLowerCase() !== 'dinajpur' && loc.toLowerCase() !== 'all') {
-    params.append('location', loc);
-  }
-  window.location.href = `doctors.html${params.toString() ? '?' + params.toString() : ''}`;
+  const term = input ? input.value.trim() : '';
+  const location = locationSelect ? locationSelect.value.trim() : '';
+  if (term) params.set('search', term);
+  if (location && location.toLowerCase() !== 'all') params.set('location', location);
+  window.location.href = `doctors.html${params.toString() ? `?${params}` : ''}`;
 }
 
-const heroSearch = document.getElementById('heroSearch');
-if (heroSearch) {
-  heroSearch.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      executeHeroSearch();
-    }
-  });
-}
-
-const heroSearchBtn = document.querySelector('.home-search .search-btn');
-if (heroSearchBtn) {
-  heroSearchBtn.removeAttribute('onclick');
-  heroSearchBtn.addEventListener('click', function (e) {
-    e.preventDefault();
-    executeHeroSearch();
-  });
-}
-
-// Global Auth State Handler for Navigation Bar
 function initAuthNavbar() {
   const userJson = localStorage.getItem('user');
-  if (!userJson) return;
+  const navActions = document.querySelector('.nav-actions');
+  if (!userJson || !navActions) return;
 
   try {
     const user = JSON.parse(userJson);
-    const navActions = document.querySelector('.nav-actions');
-    if (!navActions) return;
-
-    const roleBadge = user.role === 'admin' ? 'Admin' : (user.role === 'doctor' ? 'Dr.' : 'Patient');
-    const roleIcon = user.role === 'admin' ? 'fa-shield-halved' : (user.role === 'doctor' ? 'fa-stethoscope' : 'fa-circle-user');
-    const extraActionBtn = user.role === 'admin' 
-      ? `<a href="admin.html" class="btn-primary" style="padding:7px 14px;font-size:13px;text-decoration:none;"><i class="fa-solid fa-chart-line"></i> Dashboard</a>`
-      : `<button id="navApptsBtn" class="btn-outline" style="cursor:pointer;padding:7px 14px;font-size:13px;background:none;"><i class="fa-regular fa-calendar-check"></i> Appointments</button>`;
-
-    navActions.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px;">
-        ${extraActionBtn}
-        <span style="font-size:14px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:6px;">
-          <i class="fa-solid ${roleIcon}"></i>
-          ${roleBadge} ${user.first_name}
-        </span>
-        <button id="logoutBtn" class="btn-outline" style="cursor:pointer;padding:7px 14px;font-size:13px;background:none;">
-          <i class="fa-solid fa-right-from-bracket"></i> Log Out
-        </button>
-      </div>
-    `;
-
-    const navApptsBtn = document.getElementById('navApptsBtn');
-    if (navApptsBtn) {
-      navApptsBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (typeof openAppointmentsModal === 'function') {
-          openAppointmentsModal();
-        } else {
-          window.location.href = 'doctors.html?view=appointments';
-        }
-      });
-    }
-
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        sessionStorage.clear();
-        window.location.href = 'login.html';
-      });
-    }
-  } catch (err) {
-    console.error('Failed to parse user session:', err);
+    const roleLabel = user.role === 'admin' ? 'Admin' : user.role === 'doctor' ? 'Dr.' : 'Patient';
+    const dashboard = user.role === 'admin'
+      ? '<a href="admin.html" class="btn-primary">Dashboard</a>'
+      : '<a href="doctors.html?view=appointments" class="btn-outline">Appointments</a>';
+    navActions.innerHTML = `${dashboard}<span class="nav-user">${roleLabel} ${user.first_name || ''}</span><button id="logoutBtn" class="btn-outline" type="button">Log Out</button>`;
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      sessionStorage.clear();
+      window.location.href = 'login.html';
+    });
+  } catch (error) {
+    console.error('Failed to read the signed-in user:', error);
   }
 }
 
-document.addEventListener('DOMContentLoaded', initAuthNavbar);
-const navToggle=document.querySelector('.nav-toggle');
-if(navToggle) navToggle.addEventListener('click',()=>{const navbar=document.querySelector('.navbar');const open=navbar.classList.toggle('menu-open');navToggle.setAttribute('aria-expanded',String(open));navToggle.setAttribute('aria-label',open?'Close navigation menu':'Open navigation menu');navToggle.innerHTML='<i class="fa-solid '+(open?'fa-xmark':'fa-bars')+'" aria-hidden="true"></i>';});
-document.querySelectorAll('.nav-menu a').forEach((link)=>link.addEventListener('click',()=>{const navbar=document.querySelector('.navbar');if(navbar)navbar.classList.remove('menu-open');if(navToggle){navToggle.setAttribute('aria-expanded','false');navToggle.setAttribute('aria-label','Open navigation menu');}}));
-const newsletterForm=document.getElementById('newsletterForm');if(newsletterForm)newsletterForm.addEventListener('submit',(event)=>{event.preventDefault();document.getElementById('newsletterFeedback').textContent='Thanks! This demo does not send or save email addresses.';newsletterForm.reset();});
+document.addEventListener('DOMContentLoaded', () => {
+  initAuthNavbar();
+
+  const searchForm = document.querySelector('.home-search');
+  searchForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    executeHeroSearch();
+  });
+
+  const navToggle = document.querySelector('.nav-toggle');
+  navToggle?.addEventListener('click', () => {
+    const navbar = document.querySelector('.navbar');
+    const open = navbar?.classList.toggle('menu-open') ?? false;
+    navToggle.setAttribute('aria-expanded', String(open));
+  });
+
+  document.querySelectorAll('.nav-menu a').forEach((link) => {
+    link.addEventListener('click', () => document.querySelector('.navbar')?.classList.remove('menu-open'));
+  });
+
+  const newsletterForm = document.getElementById('newsletterForm');
+  newsletterForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const feedback = document.getElementById('newsletterFeedback');
+    if (feedback) feedback.textContent = 'Thanks! Your message has been received.';
+    newsletterForm.reset();
+  });
+
+  document.querySelectorAll('.selectable').forEach((control) => {
+    control.addEventListener('click', () => {
+      if (control.matches('a[href]')) return;
+      document.querySelectorAll('.selectable[aria-pressed]').forEach((item) => {
+        item.classList.remove('selected');
+        item.setAttribute('aria-pressed', 'false');
+      });
+      control.classList.add('selected');
+      control.setAttribute('aria-pressed', 'true');
+    });
+  });
+});

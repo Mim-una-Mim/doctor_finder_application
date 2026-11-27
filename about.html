@@ -5,37 +5,44 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About — DoctorFinder</title>
+  <link rel="stylesheet" href="legacy-shared.css" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="about.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="monochrome.css" />
 </head>
-<body class="sidebar-page">
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><i class="fa-solid fa-stethoscope"></i></span>
+        <span>DoctorFinder</span>
+      </div>
+
+      <nav class="nav" aria-label="Main navigation">
+        <a class="selectable" href="index.html"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span></a>
+        <a class="selectable" href="doctors.html"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctors</span></a>
+        <a class="selectable selected" href="about.html" aria-current="page"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>About</span></a>
+        <a class="selectable" href="index.html#contact"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>Contact</span></a>
+      </nav>
+
+      <div class="account-actions nav-actions">
+        <a class="selectable" href="login.html"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i><span>Log In</span></a>
+        <a class="selectable" href="register.html"><i class="fa-solid fa-user-plus" aria-hidden="true"></i><span>Register</span></a>
+        <a class="selectable" href="doctors.html"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i><span>Book Appointment</span></a>
+      </div>
+    </aside>
+<main class="main-content">
+
 
   <!-- NAVBAR -->
-  <nav class="navbar sidebar-nav" aria-label="Main navigation">
-    <div class="nav-header">
-      <a href="index.html" class="nav-logo"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctor<strong>Finder</strong></span></a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open navigation menu"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
-    </div>
-    <div class="nav-menu" id="primaryNav">
-      <ul class="nav-links">
-        <li><a href="index.html" ><i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span></a></li>
-        <li><a href="doctors.html" ><i class="fa-solid fa-stethoscope" aria-hidden="true"></i><span>Doctors</span></a></li>
-        <li><a href="about.html" class="active"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>About</span></a></li>
-        <li><a href="index.html#contact"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>Contact</span></a></li>
-      </ul>
-      <div class="nav-actions">
-        <a href="login.html" class="btn-outline"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Log In</a><a href="register.html" class="btn-outline register-nav-btn"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Register</a>
-        <a href="doctors.html" class="btn-primary"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Book Appointment</a>
-      </div>
-    </div>
-  </nav>
+  
 
   <!-- HERO -->
   <section class="about-hero">
-    <p class="hero-eyebrow">🏥 About DoctorFinder</p>
-    <h1>Built for the People of <span class="highlight">Dinajpur</span></h1>
+    <h3 class="hero-eyebrow">🏥 About DoctorFinder</h3>
+    <h3 class="about-hero-title">Built for the People of <span class="highlight">Dinajpur</span></h3>
     <p>A simple, fast, and trusted way to find verified doctors and book appointments — right from your phone or computer.</p>
   </section>
 
@@ -50,30 +57,6 @@
         <a href="doctors.html" class="about-cta-btn">Find a Doctor <i class="fa-solid fa-arrow-right"></i></a>
       </div>
       <div class="about-image-box about-img-placeholder medical-composition" role="img" aria-label="Medical equipment illustration"><i class="fa-solid fa-kit-medical"></i><i class="fa-solid fa-syringe"></i><i class="fa-solid fa-prescription-bottle-medical"></i></div>
-    </div>
-  </section>
-
-  <!-- STATS -->
-  <section class="about-stats">
-    <div class="about-stat">
-      <i class="fa-solid fa-stethoscope"></i>
-      <h3>150+</h3>
-      <p>Verified Doctors</p>
-    </div>
-    <div class="about-stat">
-      <i class="fa-solid fa-hospital"></i>
-      <h3>10+</h3>
-      <p>Partner Hospitals</p>
-    </div>
-    <div class="about-stat">
-      <i class="fa-solid fa-calendar-check"></i>
-      <h3>5,000+</h3>
-      <p>Appointments Booked</p>
-    </div>
-    <div class="about-stat">
-      <i class="fa-solid fa-star"></i>
-      <h3>4.8 / 5</h3>
-      <p>Average Rating</p>
     </div>
   </section>
 
@@ -169,10 +152,6 @@
       <div class="footer-col">
         <h4>Newsletter</h4>
         <p>Get health tips to your inbox.</p>
-        <div class="newsletter">
-          <input type="email" placeholder="Enter your email" />
-          <button><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
       </div>
     </div>
     <div class="footer-bottom">
@@ -180,6 +159,11 @@
     </div>
   </footer>
 
+</main>
+</div>
+
   <script src="script.js"></script>
 </body>
 </html>
+
+
